@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Egresados | Falcons</title>
+    <link rel="stylesheet" href="/Admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-top">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>FALCONS ADMIN</span>
+            </div>
+
+            <button class="mobile-close" onclick="toggleMenu()">&times;</button>
+
+            <nav class="nav-links">
+                <div class="nav-label">Core</div>
+                <a href="/dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+
+                <div class="nav-label">Gestión</div>
+                <div class="nav-dropdown">
+                    <div class="dropdown-btn">
+                        <i class="fas fa-users"></i> <span>Usuarios</span>
+                        <i class="fas fa-chevron-down icon-arrow"></i>
+                    </div>
+                    <div class="dropdown-content">
+                        <a href="/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a>
+                        <a href="/docentes"><i class="fas fa-chalkboard-teacher"></i> Docentes</a>
+                        <a href="/tutores"><i class="fas fa-user-shield"></i> Tutores</a>
+                        <a href="/egresados"><i class="fas fa-user-check"></i> Egresados</a>
+                    </div>
+                </div>
+
+                <div class="nav-dropdown">
+                    <div class="dropdown-btn">
+                        <i class="fas fa-book"></i> <span>Académico</span>
+                        <i class="fas fa-chevron-down icon-arrow"></i>
+                    </div>
+                    <div class="dropdown-content">
+                        <a href="/cursos"><i class="fas fa-book-open"></i> Cursos</a>
+                        <a href="/horarios"><i class="fas fa-clock"></i> Horarios</a>
+                        <a href="/ciclos"><i class="fas fa-sync-alt"></i> Ciclos</a>
+                        <a href="/examenes"><i class="fas fa-file-alt"></i> Exámenes</a>
+                        <a href="/calificaciones"><i class="fas fa-star"></i> Calificaciones</a>
+                        <a href="/salones"><i class="fas fa-school"></i> Salones</a>
+                        <a href="/locales"><i class="fas fa-map-marker-alt"></i> Sedes</a>
+                    </div>
+                </div>
+
+                <div class="nav-label">Procesos</div>
+                <a href="/prematriculas"><i class="fas fa-file-signature"></i> <span>Prematrícula</span></a>
+                <a href="/asistencia"><i class="fas fa-clipboard-check"></i> <span>Asistencia</span></a>
+                <a href="/pagos"><i class="fas fa-credit-card"></i> <span>Pagos</span></a>
+            </nav>
+        </div>
+
+        <a href="/logout" class="btn-logout">
+            <i class="fas fa-power-off"></i> <span>Cerrar Sistema</span>
+        </a>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <button class="hamburger-btn" onclick="toggleMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="welcome-text">
+                    <h1>Gestión de Egresados</h1>
+                    <p>Seguimiento de graduados y egresados</p>
+                </div>
+            </div>
+            <div class="user-pill">
+                <div class="user-info">
+                    <strong>Administrador</strong>
+                    <span>System Root</span>
+                </div>
+                <div class="admin-avatar">A</div>
+            </div>
+        </header>
+
+        <div class="chart-card">
+            <div class="table-actions">
+                <button class="btn-add" onclick="abrirModal()">
+                    <i class="fas fa-plus"></i> Nuevo Egresado
+                </button>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="egresadosTable">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Estudiante</th>
+                        <th>Carrera</th>
+                        <th>Institución</th>
+                        <th>Fecha Egreso</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="e : ${egresados}">
+                        <td data-label="ID" th:text="${e.id}" class="font-bold"></td>
+                        <td data-label="ESTUDIANTE" th:text="${e.estudiante.usuario.nombres + ' ' + e.estudiante.usuario.apellidos}"></td>
+                        <td data-label="CARRERA" th:text="${e.carrera}"></td>
+                        <td data-label="INSTITUCIÓN" th:text="${e.institucionDestino}"></td>
+                        <td data-label="FECHA EGRESO" th:text="${e.fechaEgreso}"></td>
+                        <td data-label="ACCIONES">
+                            <div class="actions-cell">
+                                <button class="btn-icon view" title="Ver Detalle"
+                                        onclick="verEgresado(this)"
+                                        th:data-nombre="${e.estudiante.usuario.nombres + ' ' + e.estudiante.usuario.apellidos}"
+                                        th:data-carrera="${e.carrera}"
+                                        th:data-institucion="${e.institucionDestino}"
+                                        th:data-fecha="${e.fechaEgreso}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-icon edit" title="Editar"
+                                        onclick="editarEgresado(this)"
+                                        th:data-id="${e.id}"
+                                        th:data-carrera="${e.carrera}"
+                                        th:data-institucion="${e.institucionDestino}"
+                                        th:data-fecha="${e.fechaEgreso}">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <a th:href="@{'/egresados/eliminar/' + ${e.id}}"
+                                   class="btn-icon delete" title="Eliminar"
+                                   onclick="return confirm('¿Desea eliminar este registro de egresado?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div id="modalCrear" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-graduate"></i> Nuevo Egresado</h2>
+            <button class="close-modal" onclick="cerrarModal()">&times;</button>
+        </div>
+        <form action="/egresados/guardar" method="post" class="grid-form">
+            <div class="form-section">
+                <label>Selección de Estudiante</label>
+                <select name="estudianteId" required>
+                    <option value="">Seleccione un estudiante...</option>
+                    <option th:each="es : ${estudiantes}"
+                            th:value="${es.id}"
+                            th:text="${es.usuario.nombres + ' ' + es.usuario.apellidos}">
+                    </option>
+                </select>
+            </div>
+            <div class="form-section">
+                <label>Información de Egreso</label>
+                <div class="input-group">
+                    <input type="date" name="fechaEgreso" required title="Fecha de Egreso">
+                    <input type="text" name="carrera" placeholder="Carrera egresada" required>
+                </div>
+                <div class="input-group" style="margin-top: 15px;">
+                    <input type="text" name="institucionDestino" placeholder="Institución de destino" required>
+                    <input type="text" name="observaciones" placeholder="Observaciones (Opcional)">
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Registrar Egresado</button>
+        </form>
+    </div>
+</div>
+
+<div id="modalEditar" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2><i class="fas fa-edit"></i> Editar Egresado</h2>
+            <button class="close-modal" onclick="cerrarEditar()">&times;</button>
+        </div>
+        <form id="formEditar" method="post" class="grid-form">
+            <div class="form-section">
+                <label>Actualizar Datos</label>
+                <div class="input-group">
+                    <input type="date" id="editFecha" name="fechaEgreso" required>
+                    <input type="text" id="editCarrera" name="carrera" placeholder="Carrera">
+                </div>
+                <div class="form-section" style="margin-top: 15px;">
+                    <input type="text" id="editInstitucion" name="institucionDestino" placeholder="Institución">
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Actualizar Información</button>
+        </form>
+    </div>
+</div>
+
+<div id="modalVer" class="modal-overlay">
+    <div class="modal-card detail-card">
+        <div class="modal-header">
+            <h2><i class="fas fa-id-card"></i> Detalle de Egresado</h2>
+            <button class="close-modal" onclick="cerrarVer()">&times;</button>
+        </div>
+        <div class="profile-header">
+            <div class="profile-avatar"><i class="fas fa-user-graduate"></i></div>
+            <h3 id="vNombre">Nombre Estudiante</h3>
+            <p style="color: var(--primary); font-weight: 700;">Alumni Falcons</p>
+        </div>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <i class="fas fa-university"></i>
+                <div>
+                    <span>Institución</span>
+                    <p id="vInstitucion">-</p>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-award"></i>
+                <div>
+                    <span>Carrera</span>
+                    <p id="vCarrera">-</p>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-calendar-check"></i>
+                <div>
+                    <span>Fecha Egreso</span>
+                    <p id="vFecha">-</p>
+                </div>
+            </div>
+        </div>
+        <button class="btn-submit" style="margin-top: 25px; width: 100%" onclick="cerrarVer()">Cerrar</button>
+    </div>
+</div>
+
+<script>
+    function toggleMenu() {
+        document.getElementById("sidebar").classList.toggle("active");
+        document.getElementById("sidebarOverlay").classList.toggle("active");
+    }
+
+    function abrirModal() {
+        document.getElementById("modalCrear").style.display = "flex";
+    }
+
+    function cerrarModal() {
+        document.getElementById("modalCrear").style.display = "none";
+    }
+
+    function verEgresado(btn) {
+        document.getElementById("modalVer").style.display = "flex";
+        document.getElementById("vNombre").innerText = btn.dataset.nombre;
+        document.getElementById("vCarrera").innerText = btn.dataset.carrera;
+        document.getElementById("vInstitucion").innerText = btn.dataset.institucion;
+        document.getElementById("vFecha").innerText = btn.dataset.fecha;
+    }
+
+    function cerrarVer() {
+        document.getElementById("modalVer").style.display = "none";
+    }
+
+    function editarEgresado(btn) {
+        document.getElementById("modalEditar").style.display = "flex";
+        document.getElementById("formEditar").action = "/egresados/actualizar/" + btn.dataset.id;
+        document.getElementById("editCarrera").value = btn.dataset.carrera;
+        document.getElementById("editInstitucion").value = btn.dataset.institucion;
+        document.getElementById("editFecha").value = btn.dataset.fecha;
+    }
+
+    function cerrarEditar() {
+        document.getElementById("modalEditar").style.display = "none";
+    }
+
+    function filterTable() {
+        const input = document.getElementById("searchInput");
+        const filter = input.value.toUpperCase();
+        const table = document.getElementById("egresadosTable");
+        const tr = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < tr.length; i++) {
+            const td = tr[i].getElementsByTagName("td")[1]; // Columna Estudiante
+            if (td) {
+                const txtValue = td.textContent || td.innerText;
+                tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+    }
+
+    window.onclick = function(event) {
+        if (event.target.className === 'modal-overlay') {
+            event.target.style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>

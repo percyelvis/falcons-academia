@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calificaciones | Falcons</title>
+    <link rel="stylesheet" href="/Admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-top">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>FALCONS ADMIN</span>
+            </div>
+
+            <button class="mobile-close" onclick="toggleMenu()">&times;</button>
+
+            <nav class="nav-links">
+                <div class="nav-label">Core</div>
+                <a href="/dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+
+                <div class="nav-label">Gestión</div>
+                <div class="nav-dropdown">
+                    <div class="dropdown-btn">
+                        <i class="fas fa-users"></i> <span>Usuarios</span>
+                        <i class="fas fa-chevron-down icon-arrow"></i>
+                    </div>
+                    <div class="dropdown-content">
+                        <a href="/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a>
+                        <a href="/docentes"><i class="fas fa-chalkboard-teacher"></i> Docentes</a>
+                        <a href="/tutores"><i class="fas fa-user-shield"></i> Tutores</a>
+                        <a href="/egresados"><i class="fas fa-user-check"></i> Egresados</a>
+                    </div>
+                </div>
+
+                <div class="nav-dropdown">
+                    <div class="dropdown-btn">
+                        <i class="fas fa-book"></i> <span>Académico</span>
+                        <i class="fas fa-chevron-down icon-arrow"></i>
+                    </div>
+                    <div class="dropdown-content">
+                        <a href="/cursos"><i class="fas fa-book-open"></i> Cursos</a>
+                        <a href="/horarios"><i class="fas fa-clock"></i> Horarios</a>
+                        <a href="/ciclos"><i class="fas fa-sync-alt"></i> Ciclos</a>
+                        <a href="/examenes"><i class="fas fa-file-alt"></i> Exámenes</a>
+                        <a href="/calificaciones" class="active"><i class="fas fa-star"></i> Calificaciones</a>
+                        <a href="/salones"><i class="fas fa-school"></i> Salones</a>
+                        <a href="/locales"><i class="fas fa-map-marker-alt"></i> Sedes</a>
+                    </div>
+                </div>
+
+                <div class="nav-label">Procesos</div>
+                <a href="/prematriculas"><i class="fas fa-file-signature"></i> <span>Prematrícula</span></a>
+                <a href="/asistencia"><i class="fas fa-clipboard-check"></i> <span>Asistencia</span></a>
+                <a href="/pagos"><i class="fas fa-credit-card"></i> <span>Pagos</span></a>
+            </nav>
+        </div>
+
+        <a href="/logout" class="btn-logout">
+            <i class="fas fa-power-off"></i> <span>Cerrar Sistema</span>
+        </a>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <button class="hamburger-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+                <div class="welcome-text">
+                    <h1>Módulo de Calificaciones</h1>
+                    <p>Registro masivo de notas y mérito académico</p>
+                </div>
+            </div>
+            <div class="user-pill">
+                <div class="user-info"><strong>Académico</strong><span>Admin</span></div>
+                <div class="admin-avatar">A</div>
+            </div>
+        </header>
+
+        <div class="layout-calificaciones">
+
+            <div class="content-left">
+
+                <div class="chart-card" style="margin-bottom: 25px;">
+                    <h3 style="margin-bottom: 15px;"><i class="fas fa-file-alt"></i> 1. Seleccionar Examen</h3>
+                    <select id="examenSelect" class="custom-select" onchange="setExamen()">
+                        <option value="">-- Elige un examen --</option>
+                        <option th:each="e : ${examenes}" th:value="${e.id}" th:text="${e.titulo}"></option>
+                    </select>
+                </div>
+
+                <div class="chart-card">
+                    <h3 style="margin-bottom: 15px;"><i class="fas fa-pen-square"></i> 2. Ingreso Masivo</h3>
+                    <form th:action="@{/calificaciones/guardar-masivo}" method="post">
+                        <input type="hidden" name="examenId" id="examenId">
+
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Estudiante</th>
+                                    <th style="width: 120px;">Nota</th>
+                                    <th>Observación</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="es : ${estudiantes}">
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <div class="admin-avatar" style="width: 30px; height: 30px; font-size: 11px;"
+                                                 th:text="${#strings.substring(es.usuario.nombres,0,1)}"></div>
+                                            <strong th:text="${es.usuario.nombres + ' ' + es.usuario.apellidos}"></strong>
+                                        </div>
+                                        <input type="hidden" name="estudianteIds" th:value="${es.id}">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="notas" class="input-nota-modern" min="0" max="20" step="0.1" placeholder="0.0">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="observaciones" class="custom-select" style="height: 40px;" placeholder="Opcional...">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="submit" class="btn-add" style="width: 100%; margin-top: 20px; height: 50px; justify-content: center;">
+                            <i class="fas fa-save"></i> Guardar Calificaciones
+                        </button>
+                    </form>
+                </div>
+
+                <div class="chart-card" style="margin-top: 25px;">
+                    <h3 style="margin-bottom: 15px;">📋 Registros Recientes</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Estudiante</th>
+                                <th>Examen</th>
+                                <th>Nota</th>
+                                <th>Acción</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="c : ${calificaciones}">
+                                <td th:text="${c.estudiante.usuario.nombres}"></td>
+                                <td th:text="${c.examen.titulo}"></td>
+                                <td><span class="monto-text" th:text="${c.nota}"></span></td>
+                                <td>
+                                    <a th:href="@{'/calificaciones/eliminar/' + ${c.id}}" class="btn-icon delete" onclick="return confirm('¿Eliminar nota?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="ranking-sidebar-container">
+                <div class="ranking-container">
+                    <div class="ranking-header">
+                        <i class="fas fa-trophy"></i>
+                        <h3>TOP 5 Alumnos</h3>
+                    </div>
+                    <div class="ranking-list">
+                        <div class="rank-card-item" th:each="c, stat : ${ranking}">
+                            <div th:class="'rank-badge ' + (${stat.count == 1} ? 'rank-1' : (${stat.count == 2} ? 'rank-2' : (${stat.count == 3} ? 'rank-3' : '')))"
+                                 th:text="${stat.count}">
+                            </div>
+                            <div class="rank-details">
+                                <span class="rank-name" th:text="${c.estudiante.usuario.nombres}"></span>
+                                <span class="rank-score" th:text="${c.nota} + ' pts'"></span>
+                            </div>
+                        </div>
+                        <div th:if="${#lists.isEmpty(ranking)}" style="text-align: center; color: var(--text-grey); padding: 20px;">
+                            <p>No hay datos suficientes.</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+</div>
+
+<script>
+    function setExamen() {
+        document.getElementById("examenId").value = document.getElementById("examenSelect").value;
+    }
+    function toggleMenu() {
+        document.getElementById("sidebar").classList.toggle("active");
+        document.getElementById("sidebarOverlay").classList.toggle("active");
+    }
+</script>
+
+</body>
+</html>

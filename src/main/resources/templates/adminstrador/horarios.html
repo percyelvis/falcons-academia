@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horarios | Falcons</title>
+  <link rel="stylesheet" href="/Admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <i class="fas fa-shield-alt"></i>
+        <span>FALCONS ADMIN</span>
+      </div>
+
+      <button class="mobile-close" onclick="toggleMenu()">&times;</button>
+
+      <nav class="nav-links">
+        <div class="nav-label">Core</div>
+        <a href="/dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+
+        <div class="nav-label">Gestión</div>
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-users"></i> <span>Usuarios</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+          <div class="dropdown-content">
+            <a href="/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a>
+            <a href="/docentes"><i class="fas fa-chalkboard-teacher"></i> Docentes</a>
+            <a href="/tutores"><i class="fas fa-user-shield"></i> Tutores</a>
+            <a href="/egresados"><i class="fas fa-user-check"></i> Egresados</a>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-book"></i> <span>Académico</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+          <div class="dropdown-content">
+            <a href="/cursos"><i class="fas fa-book-open"></i> Cursos</a>
+            <a href="/horarios"><i class="fas fa-clock"></i> Horarios</a>
+            <a href="/ciclos"><i class="fas fa-sync-alt"></i> Ciclos</a>
+            <a href="/examenes"><i class="fas fa-file-alt"></i> Exámenes</a>
+            <a href="/calificaciones"><i class="fas fa-star"></i> Calificaciones</a>
+            <a href="/salones"><i class="fas fa-school"></i> Salones</a>
+            <a href="/locales"><i class="fas fa-map-marker-alt"></i> Sedes</a>
+          </div>
+        </div>
+
+        <div class="nav-label">Procesos</div>
+        <a href="/prematriculas"><i class="fas fa-file-signature"></i> <span>Prematrícula</span></a>
+        <a href="/asistencia"><i class="fas fa-clipboard-check"></i> <span>Asistencia</span></a>
+        <a href="/pagos"><i class="fas fa-credit-card"></i> <span>Pagos</span></a>
+      </nav>
+    </div>
+
+    <a href="/logout" class="btn-logout">
+      <i class="fas fa-power-off"></i> <span>Cerrar Sistema</span>
+    </a>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="hamburger-btn" onclick="toggleMenu()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="welcome-text">
+          <h1>Planificación de Horarios</h1>
+          <p>Gestión de tiempos, aulas y docentes</p>
+        </div>
+      </div>
+      <div class="user-pill">
+        <div class="user-info">
+          <strong>Administrador</strong>
+          <span>System Root</span>
+        </div>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon bg-blue"><i class="fas fa-clock"></i></div>
+        <div>
+          <span class="nav-label" style="margin:0; font-size: 10px;">Total Horarios</span>
+          <h2 th:text="${horarios.size()}">0</h2>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon bg-purple"><i class="fas fa-book"></i></div>
+        <div>
+          <span class="nav-label" style="margin:0; font-size: 10px;">Cursos Activos</span>
+          <h2 th:text="${cursos.size()}">0</h2>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon bg-orange"><i class="fas fa-chalkboard-teacher"></i></div>
+        <div>
+          <span class="nav-label" style="margin:0; font-size: 10px;">Docentes</span>
+          <h2 th:text="${docentes.size()}">0</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="table-actions">
+        <div class="search-container">
+          <i class="fas fa-search" style="color: var(--text-grey)"></i>
+          <input type="text" id="filterInput" onkeyup="filterTable()" placeholder="Buscar por curso o día...">
+        </div>
+        <button class="btn-add" onclick="openCreate()">
+          <i class="fas fa-plus"></i> Crear Horario
+        </button>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="horariosTable">
+          <thead>
+          <tr>
+            <th>Día</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Curso</th>
+            <th>Docente</th>
+            <th>Salón</th>
+            <th>Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="h : ${horarios}">
+            <td data-label="DÍA" th:text="${h.dia}" class="font-bold"></td>
+            <td data-label="INICIO" th:text="${h.horaInicio}"></td>
+            <td data-label="FIN" th:text="${h.horaFin}"></td>
+            <td data-label="CURSO" th:text="${h.curso.nombre}" style="color: var(--primary); font-weight: 700;"></td>
+            <td data-label="DOCENTE" th:text="${h.docente.nombre}"></td>
+            <td data-label="SALÓN"><span class="user-pill" style="padding: 5px 12px; font-size: 12px;" th:text="${h.salon.nombre}"></span></td>
+            <td data-label="ACCIONES">
+              <div class="actions-cell">
+                <button class="btn-icon edit"
+                        th:attr="onclick=|openEdit('${h.id}','${h.dia}','${h.horaInicio}','${h.horaFin}','${h.curso.id}','${h.docente.id}','${h.salon.id}')|">
+                  <i class="fas fa-pen"></i>
+                </button>
+                <a th:href="@{'/horarios/eliminar/' + ${h.id}}"
+                   class="btn-icon delete"
+                   onclick="return confirm('¿Eliminar este horario?')">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="modalCreate" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2><i class="fas fa-calendar-plus"></i> Registrar Horario</h2>
+      <button class="close-modal" onclick="closeCreate()">&times;</button>
+    </div>
+    <form th:action="@{/horarios/guardar}" method="post" class="grid-form">
+      <div class="form-section">
+        <label>Temporalidad</label>
+        <div class="input-group">
+          <select name="dia" required>
+            <option value="">Seleccione día</option>
+            <option>Lunes</option><option>Martes</option>
+            <option>Miércoles</option><option>Jueves</option>
+            <option>Viernes</option><option>Sábado</option>
+            <option>Domingo</option>
+          </select>
+          <div style="display: flex; gap: 10px;">
+            <input type="time" name="horaInicio" required title="Hora Inicio">
+            <input type="time" name="horaFin" required title="Hora Fin">
+          </div>
+        </div>
+      </div>
+      <div class="form-section">
+        <label>Asignación Académica</label>
+        <select name="curso.id" required>
+          <option value="">Seleccione curso</option>
+          <option th:each="c : ${cursos}" th:value="${c.id}" th:text="${c.nombre}"></option>
+        </select>
+        <div class="input-group" style="margin-top: 15px;">
+          <select name="docente.id" required>
+            <option value="">Seleccione docente</option>
+            <option th:each="d : ${docentes}" th:value="${d.id}" th:text="${d.nombre}"></option>
+          </select>
+          <select name="salon.id" required>
+            <option value="">Seleccione salón</option>
+            <option th:each="s : ${salones}" th:value="${s.id}" th:text="${s.nombre}"></option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn-submit">Guardar Horario</button>
+    </form>
+  </div>
+</div>
+
+<div id="modalEdit" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2><i class="fas fa-clock-rotate-left"></i> Editar Horario</h2>
+      <button class="close-modal" onclick="closeEdit()">&times;</button>
+    </div>
+
+    <form id="editForm" method="post" class="grid-form">
+
+      <!-- 🔥 ID OCULTO -->
+      <input type="hidden" name="id" id="eId">
+
+      <!-- 🔥 RELACIONES (OBLIGATORIO PARA EVITAR NULL ERROR) -->
+      <input type="hidden" name="curso.id" id="eCurso">
+      <input type="hidden" name="docente.id" id="eDocente">
+      <input type="hidden" name="salon.id" id="eSalon">
+
+      <div class="form-section">
+        <label>Modificar Día y Horas</label>
+
+        <select name="dia" id="eDia" class="full">
+          <option>Lunes</option><option>Martes</option>
+          <option>Miércoles</option><option>Jueves</option>
+          <option>Viernes</option><option>Sábado</option>
+          <option>Domingo</option>
+        </select>
+
+        <div class="input-group" style="margin-top: 15px;">
+          <div>
+            <span class="nav-label" style="font-size: 9px; margin-left: 0;">Hora Inicio</span>
+            <input type="time" name="horaInicio" id="eInicio">
+          </div>
+          <div>
+            <span class="nav-label" style="font-size: 9px; margin-left: 0;">Hora Fin</span>
+            <input type="time" name="horaFin" id="eFin">
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit">Actualizar Horario</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("active");
+    document.getElementById("sidebarOverlay").classList.toggle("active");
+  }
+
+  function openCreate() { document.getElementById("modalCreate").style.display = "flex"; }
+  function closeCreate() { document.getElementById("modalCreate").style.display = "none"; }
+
+  function openEdit(id, dia, ini, fin, cursoId, docenteId, salonId) {
+    document.getElementById("modalEdit").style.display = "flex";
+
+    document.getElementById("eId").value = id;
+    document.getElementById("eDia").value = dia;
+    document.getElementById("eInicio").value = ini;
+    document.getElementById("eFin").value = fin;
+
+    document.getElementById("eCurso").value = cursoId;
+    document.getElementById("eDocente").value = docenteId;
+    document.getElementById("eSalon").value = salonId;
+
+    document.getElementById("editForm").action = "/horarios/actualizar/" + id;
+  }
+
+  function closeEdit() {
+    document.getElementById("modalEdit").style.display = "none";
+  }
+
+  function filterTable() {
+    let input = document.getElementById("filterInput");
+    let filter = input.value.toUpperCase();
+    let tr = document.getElementById("horariosTable").getElementsByTagName("tr");
+    for (let i = 1; i < tr.length; i++) {
+      let rowText = tr[i].textContent || tr[i].innerText;
+      tr[i].style.display = rowText.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+    }
+  }
+
+  window.onclick = function(e) {
+    if (e.target.className === 'modal-overlay') e.target.style.display = "none";
+  }
+</script>
+
+</body>
+</html>

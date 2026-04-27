@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horarios | Falcons ELP</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/styleTutor/tutorStyle.css">
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+    <label for="menu-toggle" class="hamburger">
+        <i class="fas fa-bars"></i>
+    </label>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon">
+                <i class="fas fa-rocket"></i>
+            </div>
+            <span class="brand-name">FALCONS</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="/dashboard/tutor" class="nav-item">
+                <i class="fas fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/tutores/tutor/salones" class="nav-item">
+                <i class="fas fa-user-graduate"></i>
+                <span>Estudiantes</span>
+            </a>
+
+            <a href="/tutores/tutor/horarios" class="nav-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Horarios</span>
+            </a>
+
+            <a href="/tutores/tutor/asistencia" class="nav-item">
+                <i class="fas fa-check-double"></i>
+                <span>Asistencia</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="/logout" class="logout-btn">
+                <i class="fas fa-power-off"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="welcome-text">
+                <h1>Horarios de Clases</h1>
+                <p>Consulta la programación académica de cada salón asignado.</p>
+            </div>
+            <div class="user-avatar-wrapper">
+                <img src="https://ui-avatars.com/api/?name=Tutor&background=6366f1&color=fff" alt="Avatar">
+            </div>
+        </header>
+
+        <section class="rooms-section">
+            <div class="section-title">
+                <h2><i class="fas fa-clock"></i> Seleccionar Salón</h2>
+            </div>
+
+            <div class="rooms-grid">
+                <div class="room-card"
+                     th:each="s : ${salones}"
+                     th:attr="data-id=${s.id}, data-nombre=${s.nombre}"
+                     onclick="openModal(this)">
+                    <div class="card-header">
+                        <span class="status-dot"></span>
+                        <span class="badge">PROGRAMACIÓN</span>
+                    </div>
+                    <h3 th:text="${s.nombre}">Salón Alfa</h3>
+                    <div class="card-body">
+                        <p><i class="fas fa-calendar-day"></i> Ver cronograma semanal</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="btn-manage">Ver Horarios <i class="fas fa-chevron-right"></i></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div id="modalHorario" class="modal-overlay" onclick="closeModalExterno(event)">
+    <div class="modal-box" style="max-width: 600px;">
+        <div class="modal-header">
+            <div>
+                <h3 id="titulo">Horarios</h3>
+                <p id="subtitulo">Cargando cronograma...</p>
+            </div>
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+        </div>
+
+        <div class="modal-body" id="contenido">
+        </div>
+    </div>
+</div>
+
+<script>
+    function openModal(el){
+        const id = el.dataset.id;
+        const nombre = el.dataset.nombre;
+        const cont = document.getElementById("contenido");
+
+        document.getElementById("titulo").innerText = "Horarios: " + nombre;
+        document.getElementById("subtitulo").innerText = "Programación académica semanal";
+        document.getElementById("modalHorario").style.display = "flex";
+
+        cont.innerHTML = '<div class="loader-container"><i class="fas fa-circle-notch fa-spin"></i><p>Consultando base de datos...</p></div>';
+
+        fetch(`/tutores/tutor/salon/${id}/horarios-json`)
+            .then(r => {
+                if (!r.ok) throw new Error("Error HTTP " + r.status);
+                return r.json();
+            })
+            .then(data => {
+                if (!data || data.length === 0) {
+                    cont.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>No hay horarios registrados para este salón.</p></div>';
+                    return;
+                }
+
+                let html = "";
+                data.forEach(h => {
+                    const curso = h.curso?.nombre || "Materia no definida";
+                    const docente = h.curso?.docente?.nombre || "Docente no asignado";
+                    const dia = h.dia || "Pendiente";
+                    const inicio = h.horaInicio || "--:--";
+                    const fin = h.horaFin || "--:--";
+
+                    html += `
+                        <div class="schedule-item">
+                            <div class="schedule-time">
+                                <span class="time-start">${inicio}</span>
+                                <span class="time-divider"></span>
+                                <span class="time-end">${fin}</span>
+                            </div>
+                            <div class="schedule-info">
+                                <h4>${curso}</h4>
+                                <p><i class="fas fa-chalkboard-user"></i> ${docente}</p>
+                                <div class="day-badge"><i class="fas fa-calendar-day"></i> ${dia}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                cont.innerHTML = html;
+            })
+            .catch(err => {
+                console.error(err);
+                cont.innerHTML = '<div class="empty-state"><i class="fas fa-circle-exclamation"></i><p>Error al obtener los datos.</p></div>';
+            });
+    }
+
+    function closeModal(){
+        document.getElementById("modalHorario").style.display = "none";
+    }
+
+    function closeModalExterno(e){
+        if(e.target.id === "modalHorario") closeModal();
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutores | Falcons</title>
+  <link rel="stylesheet" href="/Admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <i class="fas fa-shield-alt"></i>
+        <span>FALCONS ADMIN</span>
+      </div>
+
+      <button class="mobile-close" onclick="toggleMenu()">&times;</button>
+
+      <nav class="nav-links">
+        <div class="nav-label">Core</div>
+        <a href="/dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+
+        <div class="nav-label">Gestión</div>
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-users"></i> <span>Usuarios</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+          <div class="dropdown-content">
+            <a href="/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a>
+            <a href="/docentes"><i class="fas fa-chalkboard-teacher"></i> Docentes</a>
+            <a href="/tutores"><i class="fas fa-user-shield"></i> Tutores</a>
+            <a href="/egresados"><i class="fas fa-user-check"></i> Egresados</a>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-book"></i> <span>Académico</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+          <div class="dropdown-content">
+            <a href="/cursos"><i class="fas fa-book-open"></i> Cursos</a>
+            <a href="/horarios"><i class="fas fa-clock"></i> Horarios</a>
+            <a href="/ciclos"><i class="fas fa-sync-alt"></i> Ciclos</a>
+            <a href="/examenes"><i class="fas fa-file-alt"></i> Exámenes</a>
+            <a href="/calificaciones"><i class="fas fa-star"></i> Calificaciones</a>
+            <a href="/salones"><i class="fas fa-school"></i> Salones</a>
+            <a href="/locales"><i class="fas fa-map-marker-alt"></i> Sedes</a>
+          </div>
+        </div>
+
+        <div class="nav-label">Procesos</div>
+        <a href="/prematriculas"><i class="fas fa-file-signature"></i> <span>Prematrícula</span></a>
+        <a href="/asistencia"><i class="fas fa-clipboard-check"></i> <span>Asistencia</span></a>
+        <a href="/pagos"><i class="fas fa-credit-card"></i> <span>Pagos</span></a>
+      </nav>
+    </div>
+
+    <a href="/logout" class="btn-logout">
+      <i class="fas fa-power-off"></i> <span>Cerrar Sistema</span>
+    </a>
+  </aside>
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="hamburger-btn" onclick="toggleMenu()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="welcome-text">
+          <h1>Gestión de Tutores</h1>
+          <p>Control de padres y apoderados</p>
+        </div>
+      </div>
+
+      <div class="user-pill">
+        <div class="user-info">
+          <strong>Administrador</strong>
+          <span>System Root</span>
+        </div>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+
+    <div th:if="${success}" class="custom-alert alert-success">
+      <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+    </div>
+    <div th:if="${error}" class="custom-alert alert-error">
+      <i class="fas fa-exclamation-triangle"></i> <span th:text="${error}"></span>
+    </div>
+
+    <div class="chart-card">
+      <div class="table-actions">
+        <button class="btn-add" onclick="openModal('modalCrear')">
+          <i class="fas fa-plus"></i> Nuevo Tutor
+        </button>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre Completo</th>
+            <th>DNI</th>
+            <th>Teléfono</th>
+            <th>Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="t : ${tutores}">
+            <td data-label="ID" th:text="${t.id}" class="font-bold"></td>
+            <td data-label="NOMBRE" th:text="${t.usuario.nombres + ' ' + t.usuario.apellidos}"></td>
+            <td data-label="DNI" th:text="${t.usuario.dni}"></td>
+            <td data-label="TELÉFONO" th:text="${t.telefono}"></td>
+            <td data-label="ACCIONES">
+              <div class="actions-cell">
+                <button class="btn-icon view" title="Ver Detalle"
+                        onclick="verTutor(this)"
+                        th:data-nombre="${t.usuario.nombres + ' ' + t.usuario.apellidos}"
+                        th:data-dni="${t.usuario.dni}"
+                        th:data-telefono="${t.telefono}">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn-icon edit" title="Editar"
+                        onclick="editarTutor(this)"
+                        th:data-id="${t.id}"
+                        th:data-dni="${t.usuario.dni}"
+                        th:data-nombres="${t.usuario.nombres}"
+                        th:data-apellidos="${t.usuario.apellidos}"
+                        th:data-email="${t.usuario.email}"
+                        th:data-telefono-user="${t.usuario.telefono}"
+                        th:data-direccion="${t.usuario.direccion}"
+                        th:data-telefono-tutor="${t.telefono}">
+                  <i class="fas fa-pen"></i>
+                </button>
+                <a th:href="@{'/tutores/eliminar/' + ${t.id}}"
+                   class="btn-icon delete" title="Eliminar"
+                   onclick="return confirm('¿Está seguro de eliminar este tutor?')">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="modalCrear" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2><i class="fas fa-user-plus"></i> Nuevo Tutor</h2>
+      <button class="close-modal" onclick="closeModal('modalCrear')">&times;</button>
+    </div>
+    <form action="/tutores/guardar" method="post" class="grid-form">
+
+      <div class="form-section">
+        <label>Datos de Usuario</label>
+
+        <div class="input-group">
+          <input name="usuario.dni" placeholder="DNI" required>
+          <input name="usuario.email" type="email" placeholder="Correo electrónico" required>
+        </div>
+
+        <div class="input-group">
+          <input name="usuario.nombres" placeholder="Nombres" required>
+          <input name="usuario.apellidos" placeholder="Apellidos" required>
+        </div>
+
+        <div class="input-group">
+          <input name="usuario.telefono" placeholder="Teléfono usuario" required>
+          <input name="usuario.direccion" placeholder="Dirección">
+        </div>
+      </div>
+
+      <div class="form-section">
+        <label>Datos Tutor</label>
+
+        <input name="telefono" placeholder="Teléfono tutor" required>
+      </div>
+
+      <button type="submit" class="btn-submit">Registrar Tutor</button>
+
+    </form>
+  </div>
+</div>
+
+<div id="modalEditar" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2><i class="fas fa-edit"></i> Editar Información</h2>
+      <button class="close-modal" onclick="closeModal('modalEditar')">&times;</button>
+    </div>
+    <form id="formEditar" method="post" class="grid-form">
+      <div class="form-section">
+        <label>Actualizar Usuario</label>
+        <div class="input-group">
+          <input id="editDni" name="dni" placeholder="DNI">
+          <input id="editEmail" name="email" placeholder="Email">
+        </div>
+        <div class="input-group">
+          <input id="editNombres" name="nombres" placeholder="Nombres">
+          <input id="editApellidos" name="apellidos" placeholder="Apellidos">
+        </div>
+        <div class="input-group">
+          <input id="editTelefonoUser" name="telefono" placeholder="Teléfono Usuario">
+          <input id="editDireccion" name="direccion" placeholder="Dirección">
+        </div>
+      </div>
+      <div class="form-section">
+        <label>Actualizar Tutor</label>
+        <input id="editTelefonoTutor" name="telefonoTutor" placeholder="Teléfono Tutor">
+      </div>
+      <button type="submit" class="btn-submit">Guardar Cambios</button>
+    </form>
+  </div>
+</div>
+
+<div id="modalVer" class="modal-overlay">
+  <div class="modal-card detail-card">
+    <div class="modal-header">
+      <h2><i class="fas fa-info-circle"></i> Ficha del Tutor</h2>
+      <button class="close-modal" onclick="closeModal('modalVer')">&times;</button>
+    </div>
+    <div class="profile-header">
+      <div class="profile-avatar"><i class="fas fa-user-shield"></i></div>
+      <h3 id="vNombre">Nombre</h3>
+      <p style="color: var(--primary); font-weight: 700;">Apoderado Autorizado</p>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <i class="fas fa-id-card"></i>
+        <div>
+          <span>DNI</span>
+          <p id="vDni">-</p>
+        </div>
+      </div>
+      <div class="detail-item">
+        <i class="fas fa-phone-alt"></i>
+        <div>
+          <span>Teléfono Tutor</span>
+          <p id="vTel">-</p>
+        </div>
+      </div>
+    </div>
+    <button class="btn-submit" style="margin-top: 25px; width: 100%" onclick="closeModal('modalVer')">Cerrar</button>
+  </div>
+</div>
+
+<script>
+  function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("active");
+    document.getElementById("sidebarOverlay").classList.toggle("active");
+  }
+
+  function openModal(id) {
+    document.getElementById(id).style.display = "flex";
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).style.display = "none";
+  }
+
+  function verTutor(btn) {
+    document.getElementById("vNombre").innerText = btn.dataset.nombre;
+    document.getElementById("vDni").innerText = btn.dataset.dni;
+    document.getElementById("vTel").innerText = btn.dataset.telefono;
+    openModal("modalVer");
+  }
+
+  function editarTutor(btn) {
+    document.getElementById("formEditar").action = "/tutores/actualizar/" + btn.dataset.id;
+    document.getElementById("editDni").value = btn.dataset.dni;
+    document.getElementById("editNombres").value = btn.dataset.nombres;
+    document.getElementById("editApellidos").value = btn.dataset.apellidos;
+    document.getElementById("editEmail").value = btn.dataset.email;
+    document.getElementById("editTelefonoUser").value = btn.dataset.telefonoUser;
+    document.getElementById("editDireccion").value = btn.dataset.direccion;
+    document.getElementById("editTelefonoTutor").value = btn.dataset.telefonoTutor;
+    openModal("modalEditar");
+  }
+
+  // Cerrar alertas automáticamente después de 4 segundos
+  setTimeout(() => {
+    const alerts = document.querySelectorAll('.custom-alert');
+    alerts.forEach(alert => {
+      alert.style.opacity = '0';
+      setTimeout(() => alert.remove(), 500);
+    });
+  }, 4000);
+
+  // Cerrar al hacer clic fuera del modal
+  window.onclick = function(event) {
+    if (event.target.className === 'modal-overlay') {
+      event.target.style.display = "none";
+    }
+  }
+</script>
+
+</body>
+</html>

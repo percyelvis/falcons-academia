@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutor Pro | Falcons</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/styleTutor/tutorStyle.css">
+</head>
+
+<body>
+
+<div class="app-container">
+
+  <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+  <label for="menu-toggle" class="hamburger">
+    <i class="fas fa-bars"></i>
+  </label>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-icon">
+        <i class="fas fa-rocket"></i>
+      </div>
+      <span class="brand-name">FALCONS</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="/dashboard/tutor" class="nav-item">
+        <i class="fas fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="/tutores/tutor/salones" class="nav-item">
+        <i class="fas fa-user-graduate"></i>
+        <span>Estudiantes</span>
+      </a>
+
+      <a href="/tutores/tutor/horarios" class="nav-item">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Horarios</span>
+      </a>
+
+      <a href="/tutores/tutor/asistencia" class="nav-item">
+        <i class="fas fa-check-double"></i>
+        <span>Asistencia</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/logout" class="logout-btn">
+        <i class="fas fa-power-off"></i>
+        <span>Cerrar Sesión</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="top-bar">
+      <div class="welcome-text">
+        <h1>Panel de <span th:text="${tutor.usuario.nombres}">Tutor</span></h1>
+        <p>Resumen de actividades académicas</p>
+      </div>
+      <div class="user-avatar-wrapper">
+        <img src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Avatar">
+      </div>
+    </header>
+
+    <section class="stats-container">
+      <div class="stat-card">
+        <div class="stat-icon icon-1"><i class="fas fa-door-open"></i></div>
+        <div class="stat-info">
+          <h2 th:text="${#lists.size(tutor.salones)}">0</h2>
+          <p>Salones</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-2"><i class="fas fa-users"></i></div>
+        <div class="stat-info">
+          <h2 th:text="${totalEstudiantes}">0</h2>
+          <p>Alumnos</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-3"><i class="fas fa-star"></i></div>
+        <div class="stat-info">
+          <h2>Activo</h2>
+          <p>Estado</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="rooms-section">
+      <div class="section-title">
+        <h2><i class="fas fa-th-large"></i> Gestión de Aulas</h2>
+      </div>
+
+      <div class="rooms-grid">
+        <div class="room-card" th:each="s : ${tutor.salones}">
+          <div class="card-header">
+            <span class="status-dot"></span>
+            <span class="badge">Sede <span th:text="${s.local.nombre}">Cercado</span></span>
+          </div>
+          <h3 th:text="${s.nombre}">Salón 101</h3>
+          <div class="card-body">
+            <p><i class="fas fa-users-viewfinder"></i> Capacidad: <strong th:text="${s.capacidad}">30</strong></p>
+          </div>
+          <div class="card-footer">
+            <a th:href="@{'/tutor/salon/' + ${s.id}}" class="btn-manage">
+              Ingresar Aula <i class="fas fa-chevron-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>

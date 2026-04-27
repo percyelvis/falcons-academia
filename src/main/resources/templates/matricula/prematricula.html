@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prematrícula Falcons</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/PreMatriculaStyle.css">
+</head>
+
+<body>
+
+<div id="loaderSend" class="send-overlay">
+  <div class="send-box">
+    <div class="send-icon">
+      <i class="fas fa-paper-plane"></i>
+    </div>
+    <h2>Enviando tus datos...</h2>
+    <p>Estamos procesando tu solicitud de pre-matrícula.</p>
+
+    <div class="progress-wrapper">
+      <div class="progress-bar-fill" id="fillBar"></div>
+    </div>
+
+    <p class="wait-text">Espera un momento, por favor.</p>
+  </div>
+</div>
+
+<header class="header">
+  <a class="logo" href="/">
+    <img src="/logo.png" alt="Falcons">
+  </a>
+
+  <nav class="nav" id="nav">
+    <a href="/nosotros">Nosotros</a>
+    <a href="/calificaciones/ranking">Rankings</a>
+    <a href="/prematricula">Matricula</a>
+    <a href="/login">Plataforma</a>
+  </nav>
+
+  <div class="acciones">
+    <button class="btn-info" onclick="window.open('https://w.app/6iazvh','_blank')">Solicitar información</button>
+  </div>
+
+  <div class="hamburguesa" id="hamburguesa" onclick="toggleMenu()">☰</div>
+</header>
+
+<div class="fondo">
+  <div class="overlay"></div>
+
+  <div class="contenido">
+
+    <div class="lado-izq">
+      <h2>DA EL PRIMER PASO HACIA</h2>
+      <h1>TU INGRESO A FALCONS</h1>
+    </div>
+
+    <div class="lado-der">
+      <div class="formulario">
+
+        <h3>DEJA TUS DATOS</h3>
+        <h2>TE CONTACTAMOS EN MINUTOS</h2>
+
+        <form id="formPre" th:action="@{/prematriculas/guardar}" method="post">
+
+          <div class="grid">
+            <input name="nombres" placeholder="Nombres" required>
+            <input name="apellidos" placeholder="Apellidos" required>
+            <input name="dni" placeholder="DNI" required>
+            <input name="telefono" placeholder="Teléfono" required>
+          </div>
+
+          <input type="email" name="correo" placeholder="Correo electrónico" required>
+
+          <select name="ciclo" required>
+            <option value="">Selecciona ciclo</option>
+            <option th:each="c : ${ciclos}"
+                    th:value="${c.nombre}"
+                    th:text="${c.nombre}">
+            </option>
+          </select>
+
+          <button type="submit">Enviar</button>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleMenu() {
+    document.getElementById('nav').classList.toggle('active');
+  }
+
+  // Lógica para la animación de envío
+  const form = document.getElementById('formPre');
+  const loader = document.getElementById('loaderSend');
+  const bar = document.getElementById('fillBar');
+
+  form.addEventListener('submit', function(e) {
+    // Evitamos el envío inmediato para mostrar la animación
+    e.preventDefault();
+
+    // Mostramos el overlay
+    loader.style.display = 'flex';
+
+    // Iniciamos la barra
+    setTimeout(() => {
+      bar.style.width = "100%";
+    }, 100);
+
+    // Después de 3 segundos de animación, enviamos el formulario realmente
+    setTimeout(() => {
+      form.submit();
+    }, 3000);
+  });
+</script>
+
+<script src="/animation.js"></script>
+</body>
+</html>

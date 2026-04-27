@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Falcons</title>
+  <link rel="stylesheet" href="/Admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <i class="fas fa-shield-alt"></i>
+        <span>FALCONS ADMIN</span>
+      </div>
+
+      <button class="mobile-close" onclick="toggleMenu()">&times;</button>
+
+      <nav class="nav-links">
+        <div class="nav-label">Core</div>
+        <a href="/dashboard" class="active"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+
+        <div class="nav-label">Gestión</div>
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-users"></i> <span>Usuarios</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+          <div class="dropdown-content">
+            <a href="/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a>
+            <a href="/docentes"><i class="fas fa-chalkboard-teacher"></i> Docentes</a>
+            <a href="/tutores"><i class="fas fa-user-shield"></i> Tutores</a>
+            <a href="/egresados"><i class="fas fa-user-check"></i> Egresados</a>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-book"></i> <span>Académico</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+          <div class="dropdown-content">
+            <a href="/cursos"><i class="fas fa-book-open"></i> Cursos</a>
+            <a href="/horarios"><i class="fas fa-clock"></i> Horarios</a>
+            <a href="/ciclos"><i class="fas fa-sync-alt"></i> Ciclos</a>
+            <a href="/examenes"><i class="fas fa-file-alt"></i> Exámenes</a>
+            <a href="/calificaciones"><i class="fas fa-star"></i> Calificaciones</a>
+            <a href="/salones"><i class="fas fa-school"></i> Salones</a>
+            <a href="/locales"><i class="fas fa-map-marker-alt"></i> Sedes</a>
+          </div>
+        </div>
+
+        <div class="nav-label">Procesos</div>
+        <a href="/prematriculas"><i class="fas fa-file-signature"></i> <span>Prematrícula</span></a>
+        <a href="/asistencia"><i class="fas fa-clipboard-check"></i> <span>Asistencia</span></a>
+        <a href="/pagos"><i class="fas fa-credit-card"></i> <span>Pagos</span></a>
+      </nav>
+    </div>
+
+    <a href="/logout" class="btn-logout">
+      <i class="fas fa-power-off"></i> <span>Cerrar Sistema</span>
+    </a>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="hamburger-btn" onclick="toggleMenu()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="welcome-text">
+          <h1>Panel Administrador</h1>
+          <p>Resumen general de la institución</p>
+        </div>
+      </div>
+
+      <div class="user-pill">
+        <div class="user-info">
+          <strong>Administrador</strong>
+          <span>System Root</span>
+        </div>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon bg-blue"><i class="fas fa-user-graduate"></i></div>
+        <div class="stat-data">
+          <p>Estudiantes</p>
+          <h2 th:text="${totalEstudiantes}">0</h2>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon bg-purple"><i class="fas fa-chalkboard-teacher"></i></div>
+        <div class="stat-data">
+          <p>Docentes</p>
+          <h2 th:text="${totalDocentes}">0</h2>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon bg-orange"><i class="fas fa-book-open"></i></div>
+        <div class="stat-data">
+          <p>Cursos Activos</p>
+          <h2 th:text="${totalCursos}">0</h2>
+        </div>
+      </div>
+    </section>
+
+    <div class="dashboard-body">
+      <div class="chart-card">
+        <h3>Distribución de Datos</h3>
+        <div class="canvas-wrapper">
+          <canvas id="graficoCircular"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>Estadísticas Comparativas</h3>
+        <div class="canvas-wrapper">
+          <canvas id="graficoBarras"></canvas>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+  // Lógica del menú
+  function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("active");
+    document.getElementById("sidebarOverlay").classList.toggle("active");
+  }
+
+  const dataValues = [
+    [[${totalEstudiantes}]] || 0,
+    [[${totalDocentes}]] || 0,
+    [[${totalCursos}]] || 0
+  ];
+
+  const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { font: { family: 'Plus Jakarta Sans', weight: '600' } } }
+    }
+  };
+
+  // Gráfico Circular
+  new Chart(document.getElementById('graficoCircular'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Estudiantes', 'Docentes', 'Cursos'],
+      datasets: [{
+        data: dataValues,
+        backgroundColor: ['#4318ff', '#6f42c1', '#ffb547'],
+        hoverOffset: 10,
+        borderWidth: 0
+      }]
+    },
+    options: { ...commonOptions, cutout: '70%' }
+  });
+
+  // Gráfico de Barras
+  new Chart(document.getElementById('graficoBarras'), {
+    type: 'bar',
+    data: {
+      labels: ['Estudiantes', 'Docentes', 'Cursos'],
+      datasets: [{
+        label: 'Total',
+        data: dataValues,
+        backgroundColor: ['#4318ff', '#6f42c1', '#ffb547'],
+        borderRadius: 12
+      }]
+    },
+    options: {
+      ...commonOptions,
+      scales: {
+        y: { grid: { display: false } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+</script>
+</body>
+</html>

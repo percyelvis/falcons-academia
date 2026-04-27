@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estudiantes | Falcons ELP</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/styleTutor/tutorStyle.css">
+</head>
+
+<body>
+
+<div class="app-container">
+
+  <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+  <label for="menu-toggle" class="hamburger">
+    <i class="fas fa-bars"></i>
+  </label>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-icon">
+        <i class="fas fa-rocket"></i>
+      </div>
+      <span class="brand-name">FALCONS</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="/dashboard/tutor" class="nav-item">
+        <i class="fas fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="/tutores/tutor/salones" class="nav-item">
+        <i class="fas fa-user-graduate"></i>
+        <span>Estudiantes</span>
+      </a>
+
+      <a href="/tutores/tutor/horarios" class="nav-item">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Horarios</span>
+      </a>
+
+      <a href="/tutores/tutor/asistencia" class="nav-item">
+        <i class="fas fa-check-double"></i>
+        <span>Asistencia</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/logout" class="logout-btn">
+        <i class="fas fa-power-off"></i>
+        <span>Cerrar Sesión</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="top-bar">
+      <div class="welcome-text">
+        <h1>Gestión de Estudiantes</h1>
+        <p>Selecciona un salón para ver la lista detallada de alumnos.</p>
+      </div>
+
+      <div class="user-avatar-wrapper">
+        <img src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Avatar">
+      </div>
+    </header>
+
+    <section class="rooms-section">
+      <div class="rooms-grid">
+
+        <div class="room-card"
+             th:each="s : ${tutor.salones}"
+             th:attr="data-id=${s.id}, data-nombre=${s.nombre}"
+             onclick="openModal(this)">
+
+          <div class="card-header">
+            <span class="status-dot"></span>
+            <span class="badge">AULA ACTIVA</span>
+          </div>
+
+          <h3 th:text="${s.nombre}">Salón 101</h3>
+
+          <div class="card-body">
+            <p>
+              <i class="fas fa-map-marker-alt"></i>
+              <span th:text="${s.local.nombre}">Sede</span>
+            </p>
+
+            <p>
+              <i class="fas fa-users"></i>
+              Alumnos: <strong th:text="${s.capacidad}">0</strong>
+            </p>
+          </div>
+
+          <div class="card-footer">
+            <span class="btn-manage">
+              Explorar Alumnos <i class="fas fa-arrow-right"></i>
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div id="studentModal" class="modal-overlay" onclick="closeModalExterno(event)">
+  <div class="modal-box">
+
+    <div class="modal-header">
+      <div>
+        <h3 id="roomTitleHeader">Estudiantes</h3>
+        <p id="studentCountHeader">Cargando información...</p>
+      </div>
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+    </div>
+
+    <div class="modal-search">
+      <div class="search-wrapper">
+        <i class="fas fa-search"></i>
+        <input type="text" id="studentSearch"
+               placeholder="Buscar alumno..."
+               onkeyup="filterStudents()">
+      </div>
+    </div>
+
+    <div class="modal-body" id="studentList"></div>
+
+  </div>
+</div>
+
+<script>
+  let currentStudents = [];
+
+  function openModal(el){
+    const id = el.dataset.id;
+    const nombreSalon = el.dataset.nombre;
+
+    document.getElementById("roomTitleHeader").innerText = nombreSalon;
+    document.getElementById("studentCountHeader").innerText = "Cargando...";
+
+    const listContainer = document.getElementById("studentList");
+    listContainer.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
+
+    document.getElementById("studentModal").style.display = "flex";
+    document.getElementById("studentSearch").value = "";
+
+    // 🔥 RUTA CORRECTA DEL CONTROLLER
+    fetch('/tutores/tutor/salon/' + id)
+            .then(r => r.json())
+            .then(data => {
+              currentStudents = data || [];
+
+              document.getElementById("studentCountHeader").innerText =
+                      currentStudents.length + " estudiantes";
+
+              renderStudents(currentStudents);
+            })
+            .catch(err => {
+              console.log(err);
+              listContainer.innerHTML = "❌ Error al cargar estudiantes";
+            });
+  }
+
+  function renderStudents(students){
+    const list = document.getElementById("studentList");
+    let html = "";
+
+    if(!students || students.length === 0){
+      list.innerHTML = "No hay estudiantes en este salón";
+      return;
+    }
+
+    students.forEach(e => {
+      const nombre = e.usuario?.nombres || "Sin nombre";
+      const apellido = e.usuario?.apellidos || "";
+      const inicial = nombre.charAt(0).toUpperCase();
+
+      html += `
+        <div class="student-card-item">
+          <div class="st-avatar">${inicial}</div>
+          <div class="st-info">
+            <strong>${nombre}</strong>
+            <span>${apellido}</span>
+          </div>
+          <div class="st-status-badge">Alumno</div>
+        </div>
+      `;
+    });
+
+    list.innerHTML = html;
+  }
+
+  function filterStudents(){
+    const term = document.getElementById("studentSearch").value.toLowerCase();
+
+    const filtered = currentStudents.filter(e => {
+      const full = ((e.usuario?.nombres || "") + " " + (e.usuario?.apellidos || "")).toLowerCase();
+      return full.includes(term);
+    });
+
+    renderStudents(filtered);
+  }
+
+  function closeModal(){
+    document.getElementById("studentModal").style.display = "none";
+  }
+
+  function closeModalExterno(e){
+    if(e.target.id === "studentModal") closeModal();
+  }
+</script>
+
+</body>
+</html>

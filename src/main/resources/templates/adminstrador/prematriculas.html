@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prematrícula | Falcons</title>
+  <link rel="stylesheet" href="/Admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <i class="fas fa-shield-alt"></i>
+        <span>FALCONS ADMIN</span>
+      </div>
+
+      <button class="mobile-close" onclick="toggleMenu()">&times;</button>
+
+      <nav class="nav-links">
+        <div class="nav-label">Core</div>
+        <a href="/dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+
+        <div class="nav-label">Gestión</div>
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-users"></i> <span>Usuarios</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+          <div class="dropdown-content">
+            <a href="/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a>
+            <a href="/docentes"><i class="fas fa-chalkboard-teacher"></i> Docentes</a>
+            <a href="/tutores"><i class="fas fa-user-shield"></i> Tutores</a>
+            <a href="/egresados"><i class="fas fa-user-check"></i> Egresados</a>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-book"></i> <span>Académico</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+          <div class="dropdown-content">
+            <a href="/cursos"><i class="fas fa-book-open"></i> Cursos</a>
+            <a href="/horarios"><i class="fas fa-clock"></i> Horarios</a>
+            <a href="/ciclos"><i class="fas fa-sync-alt"></i> Ciclos</a>
+            <a href="/examenes"><i class="fas fa-file-alt"></i> Exámenes</a>
+            <a href="/calificaciones"><i class="fas fa-star"></i> Calificaciones</a>
+            <a href="/salones"><i class="fas fa-school"></i> Salones</a>
+            <a href="/locales"><i class="fas fa-map-marker-alt"></i> Sedes</a>
+          </div>
+        </div>
+
+        <div class="nav-label">Procesos</div>
+        <a href="/prematriculas" class="active"><i class="fas fa-file-signature"></i> <span>Prematrícula</span></a>
+        <a href="/asistencia"><i class="fas fa-clipboard-check"></i> <span>Asistencia</span></a>
+        <a href="/pagos"><i class="fas fa-credit-card"></i> <span>Pagos</span></a>
+      </nav>
+    </div>
+
+    <a href="/logout" class="btn-logout">
+      <i class="fas fa-power-off"></i> <span>Cerrar Sistema</span>
+    </a>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="hamburger-btn" onclick="toggleMenu()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="welcome-text">
+          <h1>Prematrículas Registradas</h1>
+          <p>Gestión de prospectos y nuevas solicitudes</p>
+        </div>
+      </div>
+      <div class="user-pill">
+        <div class="user-info">
+          <strong>Administrador</strong>
+          <span>System Root</span>
+        </div>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+
+    <div class="chart-card">
+      <div class="table-actions">
+        <div class="search-container">
+          <i class="fas fa-search" style="color: var(--text-grey)"></i>
+          <input type="text" id="searchInput" placeholder="Buscar por DNI o nombre..." onkeyup="filterTable()">
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="prematriculasTable">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Postulante</th>
+            <th>DNI</th>
+            <th>Teléfono</th>
+            <th>Correo Electrónico</th>
+            <th>Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="p : ${prematriculas}">
+            <td th:text="${p.id}" class="font-bold"></td>
+            <td>
+              <strong th:text="${p.nombres} + ' ' + ${p.apellidos}"></strong>
+            </td>
+            <td th:text="${p.dni}"></td>
+            <td th:text="${p.telefono}"></td>
+            <td th:text="${p.correo}"></td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn-icon view" title="Ver"
+                        th:attr="onclick=|verPre('${p.nombres}','${p.apellidos}','${p.dni}','${p.telefono}','${p.correo}')|">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <a th:href="@{'/prematriculas/eliminar/' + ${p.id}}"
+                   class="btn-icon delete" title="Eliminar"
+                   onclick="return confirm('¿Desea eliminar este registro?')">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="modalVer" class="modal-overlay">
+  <div class="modal-card detail-card">
+    <div class="modal-header">
+      <h2><i class="fas fa-user-circle"></i> Ficha de Registro</h2>
+      <button class="close-modal" onclick="closeModal('modalVer')">&times;</button>
+    </div>
+
+    <div class="profile-header">
+      <div class="profile-avatar"><i class="fas fa-id-card"></i></div>
+      <h3 id="ver-nombres-completos">Cargando...</h3>
+      <p id="ver-dni-sub" style="color: var(--primary); font-weight: 700;">DNI: -</p>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-item">
+        <i class="fas fa-user"></i>
+        <div>
+          <span>Nombres</span>
+          <p id="ver-nombres">-</p>
+        </div>
+      </div>
+      <div class="detail-item">
+        <i class="fas fa-user-tag"></i>
+        <div>
+          <span>Apellidos</span>
+          <p id="ver-apellidos">-</p>
+        </div>
+      </div>
+      <div class="detail-item">
+        <i class="fas fa-phone"></i>
+        <div>
+          <span>Teléfono</span>
+          <p id="ver-telefono">-</p>
+        </div>
+      </div>
+      <div class="detail-item">
+        <i class="fas fa-envelope"></i>
+        <div>
+          <span>Correo</span>
+          <p id="ver-correo">-</p>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-submit" style="margin-top: 25px; width: 100%" onclick="closeModal('modalVer')">
+      Cerrar Ventana
+    </button>
+  </div>
+</div>
+
+<script>
+  function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("active");
+    document.getElementById("sidebarOverlay").classList.toggle("active");
+  }
+
+  function openModal(id) {
+    document.getElementById(id).style.display = "flex";
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).style.display = "none";
+  }
+
+  /* VER DETALLE - CORREGIDO */
+  function verPre(nombres, apellidos, dni, telefono, correo) {
+    // Asignar nombres combinados al encabezado
+    document.getElementById("ver-nombres-completos").innerText = nombres + " " + apellidos;
+    document.getElementById("ver-dni-sub").innerText = "DNI: " + dni;
+
+    // Asignar campos individuales
+    document.getElementById("ver-nombres").innerText = nombres;
+    document.getElementById("ver-apellidos").innerText = apellidos;
+    document.getElementById("ver-telefono").innerText = telefono;
+    document.getElementById("ver-correo").innerText = correo;
+
+    openModal("modalVer");
+  }
+
+  /* FILTRO DE BUSQUEDA */
+  function filterTable() {
+    let input = document.getElementById("searchInput");
+    let filter = input.value.toUpperCase();
+    let table = document.getElementById("prematriculasTable");
+    let tr = table.getElementsByTagName("tr");
+
+    for (let i = 1; i < tr.length; i++) {
+      let rowText = tr[i].textContent || tr[i].innerText;
+      tr[i].style.display = rowText.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+    }
+  }
+
+  /* CERRAR AL TOCAR AFUERA */
+  window.onclick = function(event) {
+    if (event.target.className === 'modal-overlay') {
+      event.target.style.display = "none";
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis Pagos | Falcons</title>
+
+  <link rel="stylesheet" href="/styleEstudiante/estudianteStyle.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="dashboard-wrapper">
+  <input type="checkbox" id="menu-toggle" class="menu-toggle-input">
+
+  <!-- SIDEBAR (MISMO MENU) -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+
+      <div class="logo">
+        <i class="fas fa-feather-alt"></i>
+        <span>FALCONS</span>
+      </div>
+
+      <nav class="nav-links">
+
+        <div class="nav-label">Panel Principal</div>
+
+        <a href="/dashboard/estudiante">
+          <i class="fas fa-th-large"></i> Dashboard
+        </a>
+
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Academia</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+
+          <div class="dropdown-content">
+            <a href="/horarios/mis-horarios"><i class="fas fa-clock"></i> Horario</a>
+            <a href="/cursos/mis-cursos"><i class="fas fa-book-open"></i> Cursos</a>
+            <a href="/calificaciones/mi-ranking"><i class="fas fa-trophy"></i> Ranking</a>
+            <a href="/docentes/mis-docentes"><i class="fas fa-user-tie"></i> Docentes</a>
+          </div>
+        </div>
+
+        <a href="/calificaciones/mis-calificaciones"><i class="fas fa-star"></i> Calificaciones</a>
+        <a href="/pagos/mis-pagos"><i class="fas fa-wallet"></i> Pagos</a>
+
+        <div class="nav-label">Gestión</div>
+        <a href="/configuracion"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+
+      </nav>
+    </div>
+
+    <a href="/login" class="btn-logout">
+      <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+    </a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- HEADER -->
+    <header class="top-bar">
+
+      <label for="menu-toggle" class="hamburger-menu">
+        <i class="fas fa-bars"></i>
+      </label>
+
+      <div class="welcome-text">
+        <h1>Mis Pagos</h1>
+        <p>Estado de pensiones y cuotas académicas</p>
+      </div>
+
+    </header>
+
+    <!-- RESUMEN -->
+    <section class="stats-grid">
+
+      <div class="stat-card">
+        <div class="stat-icon bg-green-light">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-data">
+          <p>Pagos al día</p>
+          <h2 th:text="${pagados}">0</h2>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon bg-pink-light">
+          <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="stat-data">
+          <p>Pendientes</p>
+          <h2 th:text="${pendientes}">0</h2>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon bg-blue-light">
+          <i class="fas fa-money-bill"></i>
+        </div>
+        <div class="stat-data">
+          <p>Total pagado</p>
+          <h2>S/ <span th:text="${totalPagado}">0</span></h2>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- LISTA DE PAGOS -->
+    <section class="chart-card">
+
+      <div class="card-header">
+        <h3><i class="fas fa-file-invoice-dollar"></i> Historial de Pagos</h3>
+        <span class="badge-status">Actualizado</span>
+      </div>
+
+      <div class="courses-grid">
+
+        <div class="course-card" th:each="p : ${pagos}">
+
+          <h3>
+            💳 Pago #<span th:text="${p.id}">1</span>
+          </h3>
+
+          <p>
+            <i class="fas fa-dollar-sign"></i>
+            Monto: S/ <span th:text="${p.monto}">0</span>
+          </p>
+
+          <p>
+            <i class="fas fa-calendar"></i>
+            Fecha:
+            <span th:text="${p.fechaPago}">--</span>
+          </p>
+
+          <p>
+            <i class="fas fa-credit-card"></i>
+            Método:
+            <span th:text="${p.metodo}">-</span>
+          </p>
+
+          <p>
+            <i class="fas fa-info-circle"></i>
+            Estado:
+            <strong th:text="${p.estado}"
+                    th:classappend="${p.estado == 'PAGADO'} ? 'text-success' : 'text-danger'">
+              -
+            </strong>
+          </p>
+
+          <p>
+            <i class="fas fa-paperclip"></i>
+            Evidencia cargada
+          </p>
+
+          <div class="course-footer">
+            <span class="tag" th:text="${p.estado}">ESTADO</span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>

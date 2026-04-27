@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asistencia | Falcons</title>
+  <link rel="stylesheet" href="/Admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <i class="fas fa-shield-alt"></i>
+        <span>FALCONS ADMIN</span>
+      </div>
+
+      <button class="mobile-close" onclick="toggleMenu()">&times;</button>
+
+      <nav class="nav-links">
+        <div class="nav-label">Core</div>
+        <a href="/dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+
+        <div class="nav-label">Gestión</div>
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-users"></i> <span>Usuarios</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+          <div class="dropdown-content">
+            <a href="/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a>
+            <a href="/docentes"><i class="fas fa-chalkboard-teacher"></i> Docentes</a>
+            <a href="/tutores"><i class="fas fa-user-shield"></i> Tutores</a>
+            <a href="/egresados"><i class="fas fa-user-check"></i> Egresados</a>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-book"></i> <span>Académico</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+          <div class="dropdown-content">
+            <a href="/cursos"><i class="fas fa-book-open"></i> Cursos</a>
+            <a href="/horarios"><i class="fas fa-clock"></i> Horarios</a>
+            <a href="/ciclos"><i class="fas fa-sync-alt"></i> Ciclos</a>
+            <a href="/examenes"><i class="fas fa-file-alt"></i> Exámenes</a>
+            <a href="/calificaciones"><i class="fas fa-star"></i> Calificaciones</a>
+            <a href="/salones"><i class="fas fa-school"></i> Salones</a>
+            <a href="/locales"><i class="fas fa-map-marker-alt"></i> Sedes</a>
+          </div>
+        </div>
+
+        <div class="nav-label">Procesos</div>
+        <a href="/prematriculas"><i class="fas fa-file-signature"></i> <span>Prematrícula</span></a>
+        <a href="/asistencia" class="active"><i class="fas fa-clipboard-check"></i> <span>Asistencia</span></a>
+        <a href="/pagos"><i class="fas fa-credit-card"></i> <span>Pagos</span></a>
+      </nav>
+    </div>
+
+    <a href="/logout" class="btn-logout">
+      <i class="fas fa-power-off"></i> <span>Cerrar Sistema</span>
+    </a>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="hamburger-btn" onclick="toggleMenu()">
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="welcome-text">
+          <h1>Control de Asistencia</h1>
+          <p>
+            Registro diario de alumnos -
+            <!-- FIX AQUÍ 🔥 -->
+            <span th:text="${#temporals.format(T(java.time.LocalDate).now(), 'dd/MM/yyyy')}"></span>
+          </p>
+        </div>
+      </div>
+
+      <div class="user-pill">
+        <div class="user-info">
+          <strong>Administrador</strong>
+          <span>Control de Aula</span>
+        </div>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+
+    <div class="chart-card">
+      <div class="table-actions">
+        <div class="search-container">
+          <i class="fas fa-search" style="color: var(--text-grey)"></i>
+          <input type="text" id="searchInput" placeholder="Buscar alumno..." onkeyup="filterTable()">
+        </div>
+
+        <div style="font-size: 0.85rem; color: var(--text-grey); font-weight: 600;">
+          <i class="far fa-calendar-alt"></i>
+
+          <!-- FIX AQUÍ 🔥 -->
+          <span th:text="${#temporals.format(T(java.time.LocalDate).now(), 'EEEE dd MMMM')}"></span>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="asistenciaTable">
+          <thead>
+          <tr>
+            <th>Estudiante</th>
+            <th>Estado Actual</th>
+            <th>Acciones de Marcado</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr th:each="e : ${estudiantes}">
+            <td data-label="ESTUDIANTE">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="admin-avatar" style="width: 32px; height: 32px; font-size: 11px; background: var(--bg-grey); color: var(--primary);">
+                  <span th:text="${#strings.substring(e.usuario.nombres,0,1)}"></span>
+                </div>
+                <strong th:text="${e.usuario.nombres + ' ' + e.usuario.apellidos}"></strong>
+              </div>
+            </td>
+
+            <td data-label="ESTADO">
+              <span th:with="estado=${estadoMap[e.id] != null ? estadoMap[e.id] : 'PENDIENTE'}"
+                    th:class="'badge-asistencia ' +
+                             (${estado} == 'PRESENTE' ? 'status-presente' :
+                             (${estado} == 'AUSENTE' ? 'status-ausente' :
+                             (${estado} == 'TARDANZA' ? 'status-tardanza' : 'status-pendiente')))">
+                <i th:class="${estado == 'PRESENTE' ? 'fas fa-check-circle' :
+                             (estado == 'AUSENTE' ? 'fas fa-times-circle' :
+                             (estado == 'TARDANZA' ? 'fas fa-clock' : 'fas fa-hourglass-half'))}"></i>
+                <span th:text="${estado}"></span>
+              </span>
+            </td>
+
+            <td data-label="ACCIONES">
+              <div class="btn-group-asistencia">
+
+                <form action="/asistencia/marcar" method="post">
+                  <input type="hidden" name="estudianteId" th:value="${e.id}">
+                  <input type="hidden" name="estado" value="PRESENTE">
+                  <button type="submit" class="btn-mark btn-presente">
+                    <i class="fas fa-check"></i>
+                  </button>
+                </form>
+
+                <form action="/asistencia/marcar" method="post">
+                  <input type="hidden" name="estudianteId" th:value="${e.id}">
+                  <input type="hidden" name="estado" value="AUSENTE">
+                  <button type="submit" class="btn-mark btn-ausente">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </form>
+
+                <form action="/asistencia/marcar" method="post">
+                  <input type="hidden" name="estudianteId" th:value="${e.id}">
+                  <input type="hidden" name="estado" value="TARDANZA">
+                  <button type="submit" class="btn-mark btn-tardanza">
+                    <i class="fas fa-clock"></i>
+                  </button>
+                </form>
+
+              </div>
+            </td>
+          </tr>
+          </tbody>
+
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("active");
+    document.getElementById("sidebarOverlay").classList.toggle("active");
+  }
+
+  function filterTable() {
+    let input = document.getElementById("searchInput");
+    let filter = input.value.toUpperCase();
+    let tr = document.getElementById("asistenciaTable").getElementsByTagName("tr");
+
+    for (let i = 1; i < tr.length; i++) {
+      let rowText = tr[i].textContent || tr[i].innerText;
+      tr[i].style.display = rowText.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+    }
+  }
+</script>
+
+</body>
+</html>

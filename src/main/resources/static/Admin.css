@@ -1,0 +1,1007 @@
+:root {
+    --primary: #4318ff;
+    --primary-hover: #3311cc;
+    --bg: #f4f7fe;
+    --white: #ffffff;
+    --text-main: #2b3674;
+    --text-grey: #a3aed0;
+    --border: #e9edf7;
+    --sidebar-width: 280px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    overflow-x: hidden;
+}
+
+.dashboard-wrapper { display: flex; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--white);
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    transition: var(--transition);
+    z-index: 1000;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 30px;
+    padding-left: 15px;
+}
+
+.nav-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-grey);
+    text-transform: uppercase;
+    margin: 20px 0 10px 15px;
+}
+
+.nav-links a, .dropdown-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: var(--text-grey);
+    font-weight: 700;
+    border-radius: 12px;
+    transition: var(--transition);
+    cursor: pointer;
+    border: none; background: none; width: 100%;
+}
+
+.nav-links a.active, .nav-links a:hover, .dropdown-btn:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.nav-links a.active { background: var(--primary); color: white; }
+
+/* DROPDOWNS */
+.nav-dropdown { width: 100%; }
+.dropdown-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding-left: 30px;
+}
+.nav-dropdown:hover .dropdown-content { max-height: 300px; }
+.dropdown-content a { font-size: 14px; padding: 8px 15px; }
+
+.icon-arrow { margin-left: auto; font-size: 10px; transition: 0.3s; }
+.nav-dropdown:hover .icon-arrow { transform: rotate(180deg); }
+
+.btn-logout {
+    margin-top: auto;
+    padding: 12px 15px;
+    color: #ee5d50;
+    text-decoration: none;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* MAIN CONTENT */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    transition: var(--transition);
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.hamburger-menu { display: none; font-size: 24px; cursor: pointer; }
+
+.welcome-text h1 { font-size: 24px; font-weight: 800; }
+.welcome-text p { color: var(--text-grey); }
+
+.user-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    padding: 5px 5px 5px 15px;
+    border-radius: 50px;
+}
+
+.admin-avatar {
+    width: 35px;
+    height: 35px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+}
+
+/* STATS */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.stat-icon {
+    width: 50px; height: 50px;
+    border-radius: 12px;
+    display: grid; place-items: center;
+    color: white;
+}
+
+.bg-blue { background: var(--primary); }
+.bg-purple { background: #6f42c1; }
+.bg-orange { background: #ffb547; }
+
+/* CHARTS */
+.dashboard-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+}
+
+.chart-card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+}
+
+.canvas-wrapper { height: 300px; position: relative; }
+
+/* ANIMATIONS */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* MOBILE */
+.menu-toggle-input { display: none; }
+
+@media (max-width: 992px) {
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        height: 100vh;
+    }
+    .hamburger-menu { display: block; }
+
+    .menu-toggle-input:checked ~ .sidebar { left: 0; }
+    .menu-toggle-input:checked ~ .main-content {
+        filter: blur(5px);
+        pointer-events: none;
+    }
+}
+/* ================= GESTIÓN DE TABLAS Y FORMULARIOS ================= */
+
+/* Acciones de Tabla */
+.table-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    gap: 15px;
+}
+
+.search-container {
+    background: white;
+    padding: 8px 15px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 350px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.search-container input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-family: inherit;
+    font-weight: 600;
+}
+
+.btn-add {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* Tablas Profesionales */
+.table-wrapper { padding: 0; overflow: hidden; }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+thead { background: #f9f9ff; }
+th {
+    padding: 18px 25px;
+    font-size: 13px;
+    text-transform: uppercase;
+    color: var(--text-grey);
+    letter-spacing: 0.5px;
+}
+
+td {
+    padding: 18px 25px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+}
+
+tr:hover { background: #fcfcff; }
+
+.actions-cell { display: flex; gap: 8px; }
+.btn-icon {
+    width: 35px; height: 35px;
+    border-radius: 10px;
+    border: none;
+    display: grid; place-items: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-icon.view { background: #f4f7fe; color: var(--primary); }
+.btn-icon.edit { background: #e6faf5; color: var(--success); }
+.btn-icon.delete { background: #fff5f5; color: #ee5d50; }
+.btn-icon:hover { transform: scale(1.1); }
+
+/* Modales y Formularios */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-card {
+    background: white;
+    width: 90%; max-width: 600px;
+    border-radius: 24px;
+    padding: 30px;
+    animation: slideUp 0.4s ease;
+}
+
+.grid-form { display: grid; gap: 20px; }
+.form-section label {
+    display: block;
+    font-weight: 800;
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: var(--primary);
+}
+
+.input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+input, select {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #f8f9ff;
+    font-family: inherit;
+}
+
+.btn-submit {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================= ELEGANT MOBILE MENU BY PERCY ================= */
+
+/* 1. Ocultar botón de menú en PC (Escritorio) */
+.hamburger-btn {
+    display: none;
+    background: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    color: var(--primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 2. Estilos para Móvil (Pantallas menores a 992px) */
+@media (max-width: 992px) {
+    /* El botón aparece solo en celular/tablet */
+    .hamburger-btn {
+        display: flex;
+    }
+
+    .hamburger-btn:hover {
+        background: var(--primary);
+        color: white;
+        transform: scale(1.05);
+    }
+
+    /* Sidebar escondida a la izquierda por defecto */
+    .sidebar {
+        position: fixed;
+        left: -285px;
+        top: 0;
+        bottom: 0;
+        z-index: 2001;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100vh;
+    }
+
+    /* Sidebar aparece al activar la clase .active */
+    .sidebar.active {
+        left: 0;
+        box-shadow: 20px 0 50px rgba(0,0,0,0.1);
+    }
+
+    /* Fondo oscuro (Overlay) cuando el menú está abierto */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.3);
+        backdrop-filter: blur(4px);
+        display: none;
+        z-index: 2000;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+
+    /* Botón "X" de cierre dentro del menú lateral */
+    .mobile-close {
+        display: block;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: #f4f7fe;
+        border: none;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        color: var(--text-main);
+        cursor: pointer;
+        font-weight: bold;
+    }
+}
+
+/* Asegurar que en PC el botón de cierre no exista */
+@media (min-width: 993px) {
+    .mobile-close {
+        display: none;
+    }
+}
+
+
+/* ================= ELEGANT RESPONSIVE SYSTEM (FALCONS) ================= */
+
+@media (max-width: 992px) {
+    /* Ajustes del Contenedor Principal */
+    .main-content {
+        padding: 20px 15px;
+    }
+
+    .top-bar {
+        margin-bottom: 25px;
+    }
+
+    .top-bar h1 {
+        font-size: 1.2rem;
+    }
+
+    /* Adaptación de Formularios y Modales */
+    .input-group {
+        grid-template-columns: 1fr; /* Una columna en móvil */
+        gap: 10px;
+    }
+
+    .modal-card {
+        padding: 20px;
+        width: 95%;
+    }
+
+    .table-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-container {
+        width: 100%;
+    }
+
+    /* --- TABLAS RESPONSIVAS (Modo Tarjeta) --- */
+    /* Convertimos la tabla en bloques para que no haya scroll horizontal feo */
+    .table-wrapper {
+        border: none;
+        background: transparent;
+    }
+
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    /* Escondemos los encabezados originales */
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    tr {
+        background: white;
+        margin-bottom: 15px;
+        border-radius: 15px;
+        padding: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        border: 1px solid var(--border);
+    }
+
+    td {
+        border: none;
+        position: relative;
+        padding-left: 50% !important; /* Espacio para el título */
+        text-align: right;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f8f9ff;
+    }
+
+    td:last-child {
+        border-bottom: none;
+    }
+
+    /* Insertamos los títulos usando el atributo data-label del HTML */
+    td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        width: 45%;
+        text-align: left;
+        font-weight: 800;
+        color: var(--text-grey);
+        font-size: 12px;
+        text-transform: uppercase;
+    }
+
+    .actions-cell {
+        justify-content: flex-end;
+        padding-top: 15px;
+    }
+
+    /* Ajuste de detalles del Expediente */
+    .detail-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+
+/* Ajustes para pantallas muy pequeñas (iPhone/Android Mini) */
+@media (max-width: 480px) {
+    .user-pill span {
+        display: none; /* Oculta "Sistemas" para ganar espacio */
+    }
+
+    .btn-add {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+
+/* ================= BOTONES DE BÚSQUEDA Y CIERRE ================= */
+
+/* Botón de buscar dentro del contenedor blanco */
+.search-container button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 10px rgba(67, 24, 255, 0.2);
+}
+
+.search-container button:hover {
+    background: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+.search-container button:active {
+    transform: scale(0.95);
+}
+
+/* Botón "X" de los Modales */
+.close-modal {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg);
+    color: var(--text-main);
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.close-modal:hover {
+    background: #fee2e2; /* Un rojo muy suave */
+    color: #ee5d50;
+    transform: rotate(90deg);
+}
+
+/* Encabezado del Modal para alinear la X */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+    font-size: 18px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-main);
+}
+
+/* ================= VISTA DE PERFIL MODAL ================= */
+
+.detail-card {
+    max-width: 500px;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.profile-avatar {
+    width: 70px;
+    height: 70px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    display: grid;
+    place-items: center;
+    font-size: 28px;
+    font-weight: 800;
+    box-shadow: 0 10px 20px rgba(67, 24, 255, 0.2);
+}
+
+.profile-header h3 {
+    font-size: 20px;
+    color: var(--text-main);
+    margin-bottom: 5px;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    background: #f9f9ff;
+    padding: 20px;
+    border-radius: 18px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.detail-item i {
+    color: var(--primary);
+    font-size: 18px;
+    width: 25px;
+}
+
+.detail-item span {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: var(--text-grey);
+}
+
+.detail-item p {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+
+/* =========================================================
+   ESTILOS DE CONTROL DE ASISTENCIA (FALCONS)
+   ========================================================= */
+
+/* Badges de Estado */
+.badge-asistencia {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.status-presente { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+.status-ausente { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.status-tardanza { background: #fffbeb; color: #d97706; border: 1px solid #fef3c7; }
+.status-pendiente { background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
+
+/* Botones de Marcado Rápido */
+.btn-group-asistencia {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-mark {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-mark:active { transform: scale(0.9); }
+
+.btn-presente { background-color: #10b981; }
+.btn-presente:hover { background-color: #059669; box-shadow: 0 4px 8px rgba(16,185,129,0.3); }
+
+.btn-ausente { background-color: #ef4444; }
+.btn-ausente:hover { background-color: #dc2626; box-shadow: 0 4px 8px rgba(239,68,68,0.3); }
+
+.btn-tardanza { background-color: #f59e0b; }
+.btn-tardanza:hover { background-color: #d97706; box-shadow: 0 4px 8px rgba(245,158,11,0.3); }
+
+/* =========================================================
+   ESTILOS DE GESTIÓN DE PAGOS (FALCONS)
+   ========================================================= */
+
+.badge-pago {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.pago-completado { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+.pago-pendiente { background: #fffbeb; color: #d97706; border: 1px solid #fef3c7; }
+.pago-rechazado { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+.monto-text {
+    font-weight: 800;
+    color: var(--primary);
+    font-size: 1rem;
+}
+
+.metodo-pill {
+    background: #eef2ff;
+    color: #4f46e5;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* =========================================================
+   COMPONENTES DE ACCIONES (FALCONS)
+   ========================================================= */
+
+/* Contenedor de celdas de acción */
+.actions-cell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Estilo base para botones de icono circulares */
+.btn-icon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.btn-icon:active {
+    transform: scale(0.92);
+}
+
+/* Variantes de color */
+.btn-icon.view {
+    background-color: #eef2ff;
+    color: #4f46e5;
+}
+.btn-icon.view:hover {
+    background-color: #4f46e5;
+    color: white;
+}
+
+.btn-icon.edit {
+    background-color: #fffbeb;
+    color: #d97706;
+}
+.btn-icon.edit:hover {
+    background-color: #d97706;
+    color: white;
+}
+
+.btn-icon.delete {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+.btn-icon.delete:hover {
+    background-color: #dc2626;
+    color: white;
+}
+
+/* =========================================================
+   SISTEMA DE DROPDOWN (PAGOS / ASISTENCIA)
+   ========================================================= */
+
+.asistencia-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.asistencia-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: white;
+    min-width: 180px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    z-index: 1000;
+    padding: 8px 0;
+    border: 1px solid #e2e8f0;
+    margin-top: 5px;
+    overflow: hidden;
+    animation: slideDown 0.2s ease-out;
+}
+
+.asistencia-menu a {
+    color: #475569;
+    padding: 10px 16px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.asistencia-menu a i {
+    width: 16px;
+    text-align: center;
+    color: #94a3b8;
+}
+
+.asistencia-menu a:hover {
+    background-color: #f8fafc;
+    color: var(--primary);
+}
+
+.asistencia-menu a:hover i {
+    color: var(--primary);
+}
+
+/* Animación de entrada */
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Selectores de formulario modernos */
+.custom-select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    font-family: inherit;
+    font-size: 14px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+/* Badges con colores según controlador */
+.badge-pago {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.pago-completado { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+.pago-pendiente { background: #fffbeb; color: #d97706; border: 1px solid #fef3c7; }
+.pago-rechazado { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+/* Texto de monto destacado */
+.monto-text {
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.metodo-pill {
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+/* ================= MODULO CALIFICACIONES ================= */
+.layout-calificaciones {
+    display: grid;
+    grid-template-columns: 1fr 320px; /* Columna principal y sidebar de ranking */
+    gap: 25px;
+    align-items: start;
+}
+
+/* Inputs de Notas Modernos */
+.input-nota-modern {
+    width: 80px;
+    padding: 10px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 800;
+    color: var(--primary);
+    transition: all 0.3s ease;
+}
+
+.input-nota-modern:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+}
+
+/* Tarjeta de Ranking Lateral */
+.ranking-container {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 20px;
+}
+
+.ranking-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.ranking-header i { color: #f59e0b; font-size: 1.5rem; }
+
+.rank-card-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 15px;
+    margin-bottom: 12px;
+    transition: transform 0.2s;
+}
+
+.rank-card-item:hover { transform: scale(1.03); }
+
+.rank-badge {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: white;
+    background: #cbd5e1; /* Color por defecto */
+}
+
+/* Colores de Medallas */
+.rank-1 { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+.rank-2 { background: #94a3b8; }
+.rank-3 { background: #b45309; }
+
+.rank-details { flex: 1; }
+.rank-name { display: block; font-weight: 700; font-size: 0.9rem; color: #1e293b; }
+.rank-score { font-size: 0.8rem; color: var(--primary); font-weight: 600; }
+
+@media (max-width: 1100px) {
+    .layout-calificaciones { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistencia | Falcons ELP</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/styleTutor/tutorStyle.css">
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+    <label for="menu-toggle" class="hamburger">
+        <i class="fas fa-bars"></i>
+    </label>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon">
+                <i class="fas fa-rocket"></i>
+            </div>
+            <span class="brand-name">FALCONS</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="/dashboard/tutor" class="nav-item">
+                <i class="fas fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/tutores/tutor/salones" class="nav-item">
+                <i class="fas fa-user-graduate"></i>
+                <span>Estudiantes</span>
+            </a>
+
+            <a href="/tutores/tutor/horarios" class="nav-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Horarios</span>
+            </a>
+
+            <a href="/tutores/tutor/asistencia" class="nav-item">
+                <i class="fas fa-check-double"></i>
+                <span>Asistencia</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="/logout" class="logout-btn">
+                <i class="fas fa-power-off"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="welcome-text">
+                <h1>Control de Asistencia</h1>
+                <p>Registra la puntualidad de tus alumnos diariamente.</p>
+            </div>
+            <div class="user-avatar-wrapper">
+                <img src="https://ui-avatars.com/api/?name=Tutor&background=6366f1&color=fff" alt="Avatar">
+            </div>
+        </header>
+
+        <section class="rooms-section">
+            <div class="section-title">
+                <h2><i class="fas fa-clipboard-list"></i> Salones Asignados</h2>
+            </div>
+
+            <div class="rooms-grid">
+                <div class="room-card"
+                     th:each="s : ${salones}"
+                     th:attr="data-id=${s.id}, data-nombre=${s.nombre}"
+                     onclick="openModal(this)">
+                    <div class="card-header">
+                        <span class="status-dot"></span>
+                        <span class="badge">REGISTRO ABIERTO</span>
+                    </div>
+                    <h3 th:text="${s.nombre}">Salón 101</h3>
+                    <div class="card-body">
+                        <p><i class="fas fa-users-rectangle"></i> Iniciar toma de lista</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="btn-manage">Pasar Asistencia <i class="fas fa-edit"></i></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div id="modalAsistencia" class="modal-overlay" onclick="closeModalExterno(event)">
+    <div class="modal-box" style="max-width: 800px;">
+        <div class="modal-header">
+            <div>
+                <h3 id="titulo">Asistencia</h3>
+                <p id="subtitulo">Registrando para hoy: <span id="currentDate"></span></p>
+            </div>
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+        </div>
+
+        <div class="modal-search" style="padding: 15px 25px 0 25px;">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="attSearch" placeholder="Buscar alumno..." onkeyup="filterAtt()">
+            </div>
+        </div>
+
+        <div class="modal-body" id="attendanceTableContainer">
+        </div>
+
+        <div class="modal-footer-actions">
+            <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+            <button class="btn-primary" onclick="confirmarAsistencia()">
+                <i class="fas fa-cloud-upload-alt"></i> Finalizar Registro
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentStudents = [];
+    const today = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById("currentDate").innerText = today;
+
+    function openModal(el){
+        const id = el.dataset.id;
+        const nombre = el.dataset.nombre;
+        const cont = document.getElementById("attendanceTableContainer");
+
+        document.getElementById("titulo").innerText = "Asistencia: " + nombre;
+        document.getElementById("modalAsistencia").style.display = "flex";
+
+        cont.innerHTML = '<div class="loader-container"><i class="fas fa-sync fa-spin"></i><p>Cargando lista de alumnos...</p></div>';
+
+        fetch(`/tutores/tutor/salon/${id}`)
+            .then(r => r.json())
+            .then(data => {
+                currentStudents = data;
+                renderAttendance(data);
+            })
+            .catch(err => {
+                cont.innerHTML = '<div class="empty-state"><i class="fas fa-bug"></i><p>Error al conectar con el servidor.</p></div>';
+            });
+    }
+
+    function renderAttendance(data) {
+        const cont = document.getElementById("attendanceTableContainer");
+        if(data.length === 0) {
+            cont.innerHTML = '<div class="empty-state">No hay alumnos en este salón.</div>';
+            return;
+        }
+
+        let html = `
+            <table class="att-table">
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Estado</th>
+                        <th style="text-align:center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        data.forEach(e => {
+            html += `
+                <tr class="att-row" id="row-${e.id}">
+                    <td>
+                        <div class="student-cell">
+                            <div class="mini-avatar">${e.usuario.nombres.charAt(0)}</div>
+                            <div>
+                                <strong>${e.usuario.nombres}</strong><br>
+                                <small>${e.usuario.apellidos}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span id="badge-${e.id}" class="att-badge PENDIENTE">PENDIENTE</span>
+                    </td>
+                    <td>
+                        <div class="att-actions">
+                            <button title="Presente" class="act-btn p" onclick="marcar(${e.id},'PRESENTE')"><i class="fas fa-check"></i></button>
+                            <button title="Ausente" class="act-btn a" onclick="marcar(${e.id},'AUSENTE')"><i class="fas fa-times"></i></button>
+                            <button title="Tardanza" class="act-btn t" onclick="marcar(${e.id},'TARDANZA')"><i class="fas fa-clock"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += `</tbody></table>`;
+        cont.innerHTML = html;
+    }
+
+    function marcar(estudianteId, estado){
+        // Efecto visual inmediato (Optimistic UI)
+        const badge = document.getElementById(`badge-${estudianteId}`);
+        badge.className = "att-badge " + estado;
+        badge.innerText = estado;
+
+        fetch("/asistencia/marcar", {
+            method:"POST",
+            headers: { "Content-Type":"application/x-www-form-urlencoded" },
+            body: `estudianteId=${estudianteId}&estado=${estado}`
+        }).then(r => {
+            if(!r.ok) alert("Error al guardar estado de: " + estudianteId);
+        });
+    }
+
+    function filterAtt() {
+        const term = document.getElementById("attSearch").value.toLowerCase();
+        const rows = document.querySelectorAll(".att-row");
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(term) ? "" : "none";
+        });
+    }
+
+    function confirmarAsistencia() {
+        alert("¡Registro de asistencia guardado correctamente!");
+        closeModal();
+    }
+
+    function closeModal(){
+        document.getElementById("modalAsistencia").style.display = "none";
+    }
+
+    function closeModalExterno(e){
+        if(e.target.id === "modalAsistencia") closeModal();
+    }
+</script>
+
+</body>
+</html>

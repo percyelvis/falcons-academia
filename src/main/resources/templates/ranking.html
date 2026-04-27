@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking - Academia Falcons</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/ranking.css">
+</head>
+
+<body>
+
+<header class="header">
+  <a class="logo" href="/">
+    <img src="/logo.png" alt="Falcons">
+  </a>
+
+  <nav class="nav" id="nav">
+    <a href="/nosotros">Nosotros</a>
+    <a href="/calificaciones/ranking">Rankings</a>
+    <a href="/prematricula">Matricula</a>
+    <a href="/login">Plataforma</a>
+  </nav>
+
+  <div class="acciones">
+    <button class="btn-info" onclick="window.open('https://w.app/6iazvh','_blank')">Solicitar información</button>
+  </div>
+
+  <div class="hamburguesa" id="hamburguesa">
+    <i class="fas fa-bars"></i>
+  </div>
+</header>
+
+<section class="hero-ranking">
+  <div class="overlay"></div>
+
+  <div class="hero-text">
+    <span class="hero-badge"><i class="fas fa-trophy"></i> CUADRO DE HONOR</span>
+    <h1>RANKING ÉPICO FALCONS</h1>
+
+    <div class="examen-info" th:if="${examen != null}">
+      <i class="fas fa-file-alt"></i>
+      <span th:text="${examen.titulo}">Título del Examen</span>
+    </div>
+  </div>
+</section>
+
+<section class="ranking-section">
+
+  <div class="card-grid">
+
+    <div class="poke-card" th:each="c, iterStat : ${ranking}">
+
+      <div class="poke-rank">
+        <span class="rank-label">TOP</span>
+        <span class="rank-number" th:text="${iterStat.count}">1</span>
+      </div>
+
+      <div class="poke-img">
+        <img src="https://png.pngtree.com/png-vector/20250519/ourmid/pngtree-student-with-books-and-headphones-pointing-png-image_16327520.png"
+             alt="Estudiante">
+      </div>
+
+      <div class="poke-info">
+        <h3 th:text="${c.estudiante.usuario.nombres}">Nombre del Alumno</h3>
+
+        <div class="stats-container">
+          <div class="stat-item">
+            <i class="fas fa-star icon-star"></i>
+            <span>Puntaje: <strong th:text="${c.nota}">20</strong></span>
+          </div>
+          <div class="stat-item">
+            <i class="fas fa-graduation-cap"></i>
+            <span th:text="${c.examen.titulo}">Examen Semanal</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<footer class="footer">
+  <h3>ACADEMIA FALCONS</h3>
+
+  <div class="footer-grid">
+    <div>
+      <h4><i class="fas fa-map-marker-alt"></i> Ubicación</h4>
+      <p>Ayacucho - Perú</p>
+    </div>
+
+    <div>
+      <h4><i class="fas fa-headset"></i> Contacto</h4>
+      <p>Soporte académico 24/7</p>
+    </div>
+
+    <div>
+      <h4><i class="fas fa-chart-line"></i> Ranking</h4>
+      <p>Competencia real entre estudiantes</p>
+    </div>
+  </div>
+
+  <p class="copy">© 2026 Falcons. Todos los derechos reservados.</p>
+</footer>
+
+</body>
+</html>

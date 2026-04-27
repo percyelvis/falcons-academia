@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exámenes | Falcons</title>
+  <link rel="stylesheet" href="/Admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <i class="fas fa-shield-alt"></i>
+        <span>FALCONS ADMIN</span>
+      </div>
+
+      <button class="mobile-close" onclick="toggleMenu()">&times;</button>
+
+      <nav class="nav-links">
+        <div class="nav-label">Core</div>
+        <a href="/dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+
+        <div class="nav-label">Gestión</div>
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-users"></i> <span>Usuarios</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+          <div class="dropdown-content">
+            <a href="/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a>
+            <a href="/docentes"><i class="fas fa-chalkboard-teacher"></i> Docentes</a>
+            <a href="/tutores"><i class="fas fa-user-shield"></i> Tutores</a>
+            <a href="/egresados"><i class="fas fa-user-check"></i> Egresados</a>
+          </div>
+        </div>
+
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-book"></i> <span>Académico</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+          <div class="dropdown-content">
+            <a href="/cursos"><i class="fas fa-book-open"></i> Cursos</a>
+            <a href="/horarios"><i class="fas fa-clock"></i> Horarios</a>
+            <a href="/ciclos"><i class="fas fa-sync-alt"></i> Ciclos</a>
+            <a href="/examenes"><i class="fas fa-file-alt"></i> Exámenes</a>
+            <a href="/calificaciones"><i class="fas fa-star"></i> Calificaciones</a>
+            <a href="/salones"><i class="fas fa-school"></i> Salones</a>
+            <a href="/locales"><i class="fas fa-map-marker-alt"></i> Sedes</a>
+          </div>
+        </div>
+
+        <div class="nav-label">Procesos</div>
+        <a href="/prematriculas"><i class="fas fa-file-signature"></i> <span>Prematrícula</span></a>
+        <a href="/asistencia"><i class="fas fa-clipboard-check"></i> <span>Asistencia</span></a>
+        <a href="/pagos"><i class="fas fa-credit-card"></i> <span>Pagos</span></a>
+      </nav>
+    </div>
+
+    <a href="/logout" class="btn-logout">
+      <i class="fas fa-power-off"></i> <span>Cerrar Sistema</span>
+    </a>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="hamburger-btn" onclick="toggleMenu()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="welcome-text">
+          <h1>Gestión de Exámenes</h1>
+          <p>Programación y control de evaluaciones</p>
+        </div>
+      </div>
+      <div class="user-pill">
+        <div class="user-info">
+          <strong>Administrador</strong>
+          <span>System Root</span>
+        </div>
+        <div class="admin-avatar">A</div>
+      </div>
+    </header>
+
+    <div class="chart-card">
+      <div class="table-actions">
+        <div class="search-container">
+          <i class="fas fa-search" style="color: var(--text-grey)"></i>
+          <input type="text" id="searchInput" placeholder="Buscar examen..." onkeyup="filterTable()">
+        </div>
+        <button class="btn-add" onclick="openModal('modalCrear')">
+          <i class="fas fa-plus"></i> Nuevo Examen
+        </button>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="examenesTable">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Fecha</th>
+            <th>Duración</th>
+            <th>Tipo</th>
+            <th>Curso / Docente</th>
+            <th>Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="e : ${examenes}">
+            <td data-label="ID" th:text="${e.id}" class="font-bold"></td>
+            <td data-label="TÍTULO" th:text="${e.titulo}"></td>
+            <td data-label="FECHA" th:text="${e.fecha}"></td>
+            <td data-label="DURACIÓN"><span class="user-pill" style="padding: 5px 10px;" th:text="${e.duracionMinutos} + ' min'"></span></td>
+            <td data-label="TIPO" th:text="${e.tipo}"></td>
+            <td data-label="CURSO/DOCENTE">
+              <div style="display: flex; flex-direction: column;">
+                <strong th:text="${e.curso.nombre}"></strong>
+                <small style="color: var(--text-grey)" th:text="${e.docente.nombre}"></small>
+              </div>
+            </td>
+            <td data-label="ACCIONES">
+              <div class="actions-cell">
+                <button class="btn-icon view" title="Ver"
+                        th:attr="onclick=|verExamen('${e.titulo}','${e.descripcion}','${e.fecha}','${e.tipo}')|">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn-icon edit" title="Editar"
+                        th:attr="onclick=|editarExamen('${e.id}','${e.titulo}','${e.descripcion}','${e.fecha}','${e.duracionMinutos}','${e.tipo}','${e.curso.id}','${e.docente.id}')|">
+                  <i class="fas fa-pen"></i>
+                </button>
+                <a th:href="@{'/examenes/eliminar/' + ${e.id}}"
+                   class="btn-icon delete" title="Eliminar"
+                   onclick="return confirm('¿Eliminar examen?')">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="modalCrear" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2><i class="fas fa-plus-circle"></i> Nuevo Examen</h2>
+      <button class="close-modal" onclick="closeModal('modalCrear')">&times;</button>
+    </div>
+    <form action="/examenes/guardar" method="post" class="grid-form">
+      <div class="form-section">
+        <label>Información Básica</label>
+        <input type="text" name="titulo" placeholder="Título del examen" required>
+        <input type="text" name="descripcion" placeholder="Descripción breve" style="margin-top:15px;" required>
+      </div>
+      <div class="form-section">
+        <div class="input-group">
+          <div>
+            <label>Fecha</label>
+            <input type="date" name="fecha" required>
+          </div>
+          <div>
+            <label>Duración (min)</label>
+            <input type="number" name="duracionMinutos" placeholder="Ej: 90" required>
+          </div>
+        </div>
+      </div>
+      <div class="form-section">
+        <label>Asignación</label>
+        <input type="text" name="tipo" placeholder="Tipo (Parcial, Final...)" required>
+        <div class="input-group" style="margin-top:15px;">
+          <select name="curso.id" required>
+            <option value="">Curso...</option>
+            <option th:each="c : ${cursos}" th:value="${c.id}" th:text="${c.nombre}"></option>
+          </select>
+          <select name="docente.id" required>
+            <option value="">Docente...</option>
+            <option th:each="d : ${docentes}" th:value="${d.id}" th:text="${d.nombre}"></option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn-submit">Guardar Examen</button>
+    </form>
+  </div>
+</div>
+
+<div id="modalEditar" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2><i class="fas fa-edit"></i> Editar Examen</h2>
+      <button class="close-modal" onclick="closeModal('modalEditar')">&times;</button>
+    </div>
+    <form id="formEditar" method="post" class="grid-form">
+      <input type="hidden" id="edit-id">
+      <div class="form-section">
+        <input type="text" id="edit-titulo" name="titulo" placeholder="Título">
+        <input type="text" id="edit-descripcion" name="descripcion" placeholder="Descripción" style="margin-top:15px;">
+      </div>
+      <div class="form-section">
+        <div class="input-group">
+          <input type="date" id="edit-fecha" name="fecha">
+          <input type="number" id="edit-duracion" name="duracionMinutos" placeholder="Minutos">
+        </div>
+      </div>
+      <div class="form-section">
+        <input type="text" id="edit-tipo" name="tipo" placeholder="Tipo">
+        <div class="input-group" style="margin-top:15px;">
+          <select id="edit-curso" name="curso.id">
+            <option th:each="c : ${cursos}" th:value="${c.id}" th:text="${c.nombre}"></option>
+          </select>
+          <select id="edit-docente" name="docente.id">
+            <option th:each="d : ${docentes}" th:value="${d.id}" th:text="${d.nombre}"></option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn-submit">Actualizar Cambios</button>
+    </form>
+  </div>
+</div>
+
+<div id="modalVer" class="modal-overlay">
+  <div class="modal-card detail-card">
+    <div class="modal-header">
+      <h2><i class="fas fa-info-circle"></i> Detalle del Examen</h2>
+      <button class="close-modal" onclick="closeModal('modalVer')">&times;</button>
+    </div>
+    <div class="profile-header">
+      <div class="profile-avatar"><i class="fas fa-file-signature"></i></div>
+      <h3 id="ver-titulo">Título</h3>
+      <p id="ver-tipo" style="color: var(--primary); font-weight: 700;">Tipo de Examen</p>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <i class="fas fa-calendar"></i>
+        <div>
+          <span>Fecha Programada</span>
+          <p id="ver-fecha">-</p>
+        </div>
+      </div>
+      <div class="detail-item">
+        <i class="fas fa-align-left"></i>
+        <div>
+          <span>Descripción</span>
+          <p id="ver-desc">-</p>
+        </div>
+      </div>
+    </div>
+    <button class="btn-submit" style="margin-top: 25px; width: 100%" onclick="closeModal('modalVer')">Cerrar</button>
+  </div>
+</div>
+
+<script>
+  function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("active");
+    document.getElementById("sidebarOverlay").classList.toggle("active");
+  }
+
+  function openModal(id) {
+    document.getElementById(id).style.display = "flex";
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).style.display = "none";
+  }
+
+  function verExamen(titulo, desc, fecha, tipo) {
+    document.getElementById("ver-titulo").innerText = titulo;
+    document.getElementById("ver-desc").innerText = desc;
+    document.getElementById("ver-fecha").innerText = fecha;
+    document.getElementById("ver-tipo").innerText = tipo;
+    openModal("modalVer");
+  }
+
+  function editarExamen(id, titulo, desc, fecha, duracion, tipo, cursoId, docenteId) {
+    document.getElementById("formEditar").action = "/examenes/actualizar/" + id;
+    document.getElementById("edit-id").value = id;
+    document.getElementById("edit-titulo").value = titulo;
+    document.getElementById("edit-descripcion").value = desc;
+    document.getElementById("edit-fecha").value = fecha;
+    document.getElementById("edit-duracion").value = duracion;
+    document.getElementById("edit-tipo").value = tipo;
+    document.getElementById("edit-curso").value = cursoId;
+    document.getElementById("edit-docente").value = docenteId;
+    openModal("modalEditar");
+  }
+
+  function filterTable() {
+    let input = document.getElementById("searchInput");
+    let filter = input.value.toUpperCase();
+    let tr = document.getElementById("examenesTable").getElementsByTagName("tr");
+    for (let i = 1; i < tr.length; i++) {
+      let rowText = tr[i].textContent || tr[i].innerText;
+      tr[i].style.display = rowText.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+    }
+  }
+
+  window.onclick = function(event) {
+    if (event.target.className === 'modal-overlay') {
+      event.target.style.display = "none";
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosotros - Falcons</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/nosotros.css">
+</head>
+
+<body>
+
+<header class="header">
+    <a class="logo" href="/">
+        <img src="/logo.png" alt="Falcons">
+    </a>
+
+    <nav class="nav" id="nav">
+        <a href="/nosotros">Nosotros</a>
+        <a href="/calificaciones/ranking">Rankings</a>
+        <a href="/prematricula">Matricula</a>
+        <a href="/login">Plataforma</a>
+    </nav>
+
+    <div class="acciones">
+        <button class="btn-info" onclick="window.open('https://w.app/6iazvh','_blank')">Solicitar información</button>
+    </div>
+
+    <div class="hamburguesa" id="hamburguesa">☰</div>
+</header>
+
+<section class="hero">
+    <div class="overlay"></div>
+    <div class="hero-content animar">
+        <span class="hero-badge">MÁS QUE UNA ACADEMIA</span>
+        <h1>ACADEMIA FALCONS</h1>
+        <p>Formamos estudiantes con disciplina, exigencia y mentalidad ganadora para lograr tu ingreso universitario.</p>
+    </div>
+</section>
+
+<section class="beneficios-container">
+
+    <div class="titulo-seccion animar">
+        <span class="subtitulo">Excelencia Académica</span>
+        <h2>¿Por qué elegir nuestra metodología?</h2>
+        <div class="linea-decorativa"></div>
+    </div>
+
+    <div class="modulos-grid">
+
+        <div class="modulo-card animar">
+            <div class="icon-box">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <h3>+3700 Ingresantes</h3>
+            <p>Estudiantes que hoy ya cumplen sus metas en las mejores universidades.</p>
+        </div>
+
+        <div class="modulo-card animar">
+            <div class="icon-box">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <h3>Docentes Expertos</h3>
+            <p>Especialistas con años de experiencia en exámenes de admisión UNSCH.</p>
+        </div>
+
+        <div class="modulo-card animar">
+            <div class="icon-box">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <h3>Entrenamiento Intensivo</h3>
+            <p>Simulacros tipo admisión y evaluaciones de rendimiento constante.</p>
+        </div>
+
+        <div class="modulo-card animar">
+            <div class="icon-box">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h3>Disciplina de Hierro</h3>
+            <p>Fomentamos hábitos de alto rendimiento y control emocional.</p>
+        </div>
+
+    </div>
+
+    <div class="frase-contenedor animar">
+        <i class="fas fa-quote-left"></i>
+        <p class="frase-final">“La disciplina tarde o temprano vencerá a la inteligencia”</p>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-box">
+            <h3>Falcons</h3>
+            <p>Academia preuniversitaria de alto rendimiento.</p>
+        </div>
+        <div class="footer-box">
+            <h3>Contacto</h3>
+            <p>📞 982 111 747</p>
+            <p>📧 falconsoficial@gmail.com</p>
+        </div>
+        <div class="footer-box">
+            <h3>Plataforma</h3>
+            <p>Clases virtuales 24/7</p>
+        </div>
+    </div>
+    <div class="copy">
+        © 2026 Falcons. Todos los derechos reservados.
+    </div>
+</footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const hamburguesa = document.getElementById("hamburguesa");
+        const nav = document.getElementById("nav");
+
+        hamburguesa.addEventListener("click", () => {
+            nav.classList.toggle("active");
+        });
+
+        const items = document.querySelectorAll(".animar");
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting){
+                    entry.target.classList.add("show");
+                }
+            });
+        }, { threshold: 0.1 });
+
+        items.forEach(el => observer.observe(el));
+    });
+</script>
+
+</body>
+</html>

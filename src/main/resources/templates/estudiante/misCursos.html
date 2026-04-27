@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Cursos | Falcons</title>
+
+    <link rel="stylesheet" href="/styleEstudiante/estudianteStyle.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="dashboard-wrapper">
+    <input type="checkbox" id="menu-toggle" class="menu-toggle-input">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-top">
+
+            <div class="logo">
+                <i class="fas fa-feather-alt"></i>
+                <span>FALCONS</span>
+            </div>
+
+            <nav class="nav-links">
+
+                <div class="nav-label">Panel Principal</div>
+
+                <a href="/dashboard/estudiante">
+                    <i class="fas fa-th-large"></i> <span>Dashboard</span>
+                </a>
+
+                <div class="nav-dropdown">
+                    <div class="dropdown-btn">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Academia</span>
+                        <i class="fas fa-chevron-down icon-arrow"></i>
+                    </div>
+
+                    <div class="dropdown-content">
+                        <a href="/horarios/mis-horarios"><i class="fas fa-clock"></i> Horario</a>
+                        <a href="/cursos/mis-cursos"><i class="fas fa-book-open"></i> Cursos</a>
+                        <a href="/calificaciones/mi-ranking"><i class="fas fa-chart-line"></i> Ranking</a>
+                        <a href="/docentes/mis-docentes"><i class="fas fa-user-tie"></i> Docentes</a>
+                    </div>
+                </div>
+
+                <a href="/calificaciones/mis-calificaciones"><i class="fas fa-star"></i> <span>Calificaciones</span></a>
+
+                <!-- 🔥 GESTIÓN RESTAURADO -->
+                <div class="nav-label">Gestión</div>
+
+                <a href="/pagos/mis-pagos"><i class="fas fa-wallet"></i> Pagos</a>
+                <a href="/configuracion"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+
+            </nav>
+        </div>
+
+        <a href="/login" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i> <span>Cerrar sesión</span>
+        </a>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <header class="top-bar">
+            <label for="menu-toggle" class="hamburger-menu">
+                <i class="fas fa-bars"></i>
+            </label>
+
+            <div class="welcome-text">
+                <h1>Mis Cursos</h1>
+                <p>Cursos asignados a tu salón</p>
+            </div>
+        </header>
+
+        <!-- CURSOS -->
+        <section class="courses-grid">
+
+            <div class="course-card" th:each="c : ${cursos}">
+
+                <h3 th:text="${c.nombre}">Curso</h3>
+
+                <p><i class="fas fa-user-tie"></i>
+                    <span th:text="${c.docente != null ? c.docente.nombre : 'Sin docente'}"></span>
+                </p>
+
+                <p><i class="fas fa-layer-group"></i>
+                    <span th:text="${c.ciclo != null ? c.ciclo.nombre : 'Sin ciclo'}"></span>
+                </p>
+
+                <p><i class="fas fa-calendar"></i>
+                    <span th:text="'Clases: ' + ${c.horarios.size()}"></span>
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+</div>
+
+</body>
+</html>

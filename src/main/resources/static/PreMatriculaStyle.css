@@ -1,0 +1,292 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    padding-top:80px;
+}
+
+/* HEADER */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 40px;
+    background:white;
+    position:fixed;
+    width:100%;
+    top:0;
+    z-index:1000;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* LOGO */
+.logo img{
+    height:40px;
+}
+
+/* NAV */
+.nav{
+    display:flex;
+}
+
+.nav a{
+    margin:0 12px;
+    text-decoration:none;
+    color:#444;
+    font-weight:500;
+    transition:0.3s;
+}
+
+.nav a:hover{
+    color:#2d5bff;
+}
+
+/* BOTONES HEADER */
+.acciones{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.btn-info{
+    background:#2d5bff;
+    color:white;
+    border:none;
+    margin-top: 1.5px;
+    padding:8px 14px;
+    border-radius:6px;
+    cursor:pointer;
+    transition:0.3s;
+    text-decoration:none;
+    font-weight:430;
+    display:inline-block;
+}
+
+.btn-info:hover{
+    background:#1f45cc;
+}
+
+/* HAMBURGUESA */
+.hamburguesa{
+    display:none;
+    font-size:26px;
+    cursor:pointer;
+}
+/* FONDO */
+.fondo{
+    position:relative;
+    width:100%;
+    height:100vh;
+    background:url('PreMatricula.png') no-repeat center center/cover;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/* CAPA OSCURA */
+.overlay{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.4);
+}
+
+/* CONTENIDO */
+.contenido{
+    position:relative;
+    z-index:2;
+    display:flex;
+    width:90%;
+    max-width:1200px;
+    justify-content:space-between;
+    align-items:center;
+}
+
+/* TEXTO */
+.lado-izq{
+    color:white;
+    width:50%;
+}
+
+.lado-izq h2{
+    font-weight:300;
+}
+
+.lado-izq h1{
+    font-size:42px;
+}
+
+/* FORMULARIO */
+.lado-der{
+    width:40%;
+}
+
+.formulario{
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+.formulario h3{
+    font-weight:300;
+}
+
+.formulario h2{
+    margin-bottom:10px;
+}
+
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+input,select{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
+}
+
+button{
+    width:100%;
+    margin-top:20px;
+    padding:12px;
+    background:#f7c56b;
+    border:none;
+    font-weight:bold;
+    cursor:pointer;
+    border-radius:6px;
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+
+    .contenido{
+        flex-direction:column;
+        text-align:center;
+    }
+
+    .lado-izq,.lado-der{
+        width:100%;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .lado-izq h1{
+        font-size:28px;
+    }
+
+    .nav{
+        position:absolute;
+        top:70px;
+        right:0;
+        background:white;
+        width:220px;
+        flex-direction:column;
+        display:none;
+        box-shadow:0 5px 15px rgba(0,0,0,0.2);
+    }
+    .nav a{
+        padding:15px;
+        border-bottom:1px solid #eee;
+    }
+
+    .nav.active{
+        display:flex;
+    }
+
+    .hamburguesa{
+        display:block;
+    }
+
+}
+
+.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.visible {
+    display: block;
+    opacity: 1;
+}
+
+/* --- ANIMACIÓN DE ENVÍO CON BARRA DE PROGRESO --- */
+.send-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.97);
+    z-index: 10000;
+    display: none; /* Se activa con JS */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(8px);
+}
+
+.send-box {
+    text-align: center;
+    width: 90%;
+    max-width: 420px;
+    padding: 40px;
+    background: #ffffff;
+    border-radius: 25px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+}
+
+.send-icon {
+    font-size: 3.5rem;
+    color: #2d5bff;
+    margin-bottom: 20px;
+    animation: planeFly 2s infinite ease-in-out;
+}
+
+@keyframes planeFly {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(5deg); }
+}
+
+.send-box h2 {
+    color: #1a1a1a;
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+.send-box p {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* CONTENEDOR BARRA */
+.progress-wrapper {
+    width: 100%;
+    height: 10px;
+    background: #edf0f5;
+    border-radius: 20px;
+    margin: 30px 0 15px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #2d5bff, #6384ff);
+    border-radius: 20px;
+    transition: width 3s linear; /* Duración de la barra */
+}
+
+.wait-text {
+    font-size: 0.8rem;
+    color: #999;
+    font-style: italic;
+}

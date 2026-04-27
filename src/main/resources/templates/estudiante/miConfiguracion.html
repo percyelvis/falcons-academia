@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuración Estudiante | Falcons</title>
+
+  <link rel="stylesheet" href="/styleEstudiante/estudianteStyle.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="dashboard-wrapper">
+  <input type="checkbox" id="menu-toggle" class="menu-toggle-input">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+
+      <div class="logo">
+        <i class="fas fa-feather-alt"></i>
+        <span>FALCONS</span>
+      </div>
+
+      <nav class="nav-links">
+
+        <div class="nav-label">Panel Principal</div>
+
+        <a href="/dashboard/estudiante">
+          <i class="fas fa-th-large"></i> Dashboard
+        </a>
+
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Academia</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+
+          <div class="dropdown-content">
+            <a href="/horarios/mis-horarios"><i class="fas fa-clock"></i> Horario</a>
+            <a href="/cursos/mis-cursos"><i class="fas fa-book-open"></i> Cursos</a>
+            <a href="/calificaciones/mi-ranking"><i class="fas fa-chart-line"></i> Ranking</a>
+            <a href="/docentes/mis-docentes"><i class="fas fa-user-tie"></i> Docentes</a>
+          </div>
+        </div>
+
+        <a href="/calificaciones/mis-calificaciones">
+          <i class="fas fa-star"></i> Calificaciones
+        </a>
+
+        <div class="nav-label">Gestión</div>
+
+        <a href="/pagos/mis-pagos">
+          <i class="fas fa-wallet"></i> Pagos
+        </a>
+
+        <a href="/configuracion"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+
+      </nav>
+    </div>
+
+    <a href="/login" class="btn-logout">
+      <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+    </a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- HEADER -->
+    <header class="top-bar">
+
+      <label for="menu-toggle" class="hamburger-menu">
+        <i class="fas fa-bars"></i>
+      </label>
+
+      <div class="welcome-text">
+        <h1>Configuración de Cuenta</h1>
+        <p>Administra tus datos personales y seguridad</p>
+      </div>
+
+    </header>
+
+    <!-- CONTENIDO -->
+    <section class="stats-grid">
+
+      <!-- DATOS PERSONALES -->
+      <div class="stat-card">
+
+        <div class="stat-icon bg-blue-light">
+          <i class="fas fa-user"></i>
+        </div>
+
+        <div class="stat-data">
+
+          <p>Datos personales</p>
+
+          <h2>
+            <span th:text="|${usuario.nombres} ${usuario.apellidos}|">
+              Nombre Usuario
+            </span>
+          </h2>
+
+          <p>
+            <i class="fas fa-envelope"></i>
+            <span th:text="${usuario.email}">correo</span>
+          </p>
+
+          <p>
+            <i class="fas fa-phone"></i>
+            <span th:text="${usuario.telefono}">telefono</span>
+          </p>
+
+          <p>
+            <i class="fas fa-map-marker-alt"></i>
+            <span th:text="${usuario.direccion}">direccion</span>
+          </p>
+
+        </div>
+
+      </div>
+
+      <!-- SEGURIDAD -->
+      <div class="stat-card">
+
+        <div class="stat-icon bg-green-light">
+          <i class="fas fa-lock"></i>
+        </div>
+
+        <div class="stat-data">
+
+          <p>Seguridad</p>
+          <h2>Cambiar contraseña</h2>
+
+          <form th:action="@{/configuracion/cambiar-password}" method="post"
+                style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+
+            <input type="password" name="actual" placeholder="Contraseña actual"
+                   style="padding:10px; border-radius:10px; border:1px solid #e9edf7;">
+
+            <input type="password" name="nueva" placeholder="Nueva contraseña"
+                   style="padding:10px; border-radius:10px; border:1px solid #e9edf7;">
+
+            <button type="submit"
+                    style="background:#4318ff; color:white; border:none; padding:10px; border-radius:10px; font-weight:700; cursor:pointer;">
+              Actualizar contraseña
+            </button>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>

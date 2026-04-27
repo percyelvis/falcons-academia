@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking Estudiantes | Falcons</title>
+
+  <link rel="stylesheet" href="/styleEstudiante/estudianteStyle.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="dashboard-wrapper">
+  <input type="checkbox" id="menu-toggle" class="menu-toggle-input">
+
+  <!-- SIDEBAR (NO TOCADO) -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+
+      <div class="logo">
+        <i class="fas fa-feather-alt"></i>
+        <span>FALCONS</span>
+      </div>
+
+      <nav class="nav-links">
+
+        <div class="nav-label">Panel Principal</div>
+
+        <a href="/dashboard/estudiante">
+          <i class="fas fa-th-large"></i> Dashboard
+        </a>
+
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Academia</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+
+          <div class="dropdown-content">
+            <a href="/horarios/mis-horarios"><i class="fas fa-clock"></i> Horario</a>
+            <a href="/cursos/mis-cursos"><i class="fas fa-book-open"></i> Cursos</a>
+            <a href="/calificaciones/mi-ranking" class="active"><i class="fas fa-trophy"></i> Ranking</a>
+            <a href="/docentes/mis-docentes"><i class="fas fa-user-tie"></i> Docentes</a>
+          </div>
+        </div>
+
+        <a href="/calificaciones/mis-calificaciones"><i class="fas fa-star"></i> Calificaciones</a>
+
+        <div class="nav-label">Gestión</div>
+        <a href="/pagos/mis-pagos"><i class="fas fa-wallet"></i> Pagos</a>
+        <a href="/configuracion"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+
+      </nav>
+    </div>
+
+    <a href="/login" class="btn-logout">
+      <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+    </a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- HEADER -->
+    <header class="top-bar">
+
+      <label for="menu-toggle" class="hamburger-menu">
+        <i class="fas fa-bars"></i>
+      </label>
+
+      <div class="welcome-text">
+        <h1>Ranking de Estudiantes</h1>
+        <p>Resultados del sistema académico Falcons</p>
+      </div>
+
+    </header>
+
+    <!-- 🧠 MI POSICIÓN -->
+    <section class="stats-grid">
+
+      <div class="stat-card">
+        <div class="stat-icon bg-blue-light">
+          <i class="fas fa-trophy"></i>
+        </div>
+
+        <div class="stat-data">
+          <p>Mi posición en el ranking</p>
+          <h2>
+            <span th:text="${miPosicion}">0</span>°
+            lugar
+          </h2>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 🏆 RANKING -->
+    <section class="chart-card">
+
+      <div class="card-header">
+        <h3><i class="fas fa-trophy"></i> Tabla de Posiciones</h3>
+        <span class="badge-status">Actualizado</span>
+      </div>
+
+      <div class="courses-grid">
+
+        <!-- LOOP RANKING -->
+        <div class="course-card" th:each="c, iter : ${ranking}">
+
+          <div class="course-icon">
+            <i class="fas fa-medal"></i>
+          </div>
+
+          <h3>
+            <span th:text="${iter.index + 1}">1</span>° Lugar
+          </h3>
+
+          <p>
+            <i class="fas fa-user"></i>
+            <span th:text="${c[1]}">Estudiante</span>
+          </p>
+
+          <p>
+            <i class="fas fa-star"></i>
+            Promedio:
+            <strong th:text="${c[2]}">0</strong>
+          </p>
+
+          <p>
+            <i class="fas fa-id-badge"></i>
+            ID:
+            <span th:text="${c[0]}">0</span>
+          </p>
+
+          <!-- MEDALLAS -->
+          <div class="course-footer">
+
+            <span class="tag" th:if="${iter.index == 0}">🥇 Oro</span>
+            <span class="tag" th:if="${iter.index == 1}">🥈 Plata</span>
+            <span class="tag" th:if="${iter.index == 2}">🥉 Bronce</span>
+            <span class="tag" th:if="${iter.index > 2}">Participante</span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>

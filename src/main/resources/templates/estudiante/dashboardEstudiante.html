@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Estudiante | Falcons</title>
+  <link rel="stylesheet" href="/styleEstudiante/estudianteStyle.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+  <input type="checkbox" id="menu-toggle" class="menu-toggle-input">
+
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <i class="fas fa-feather-alt"></i>
+        <span>FALCONS</span>
+      </div>
+
+      <nav class="nav-links">
+        <div class="nav-label">Panel Principal</div>
+        <a href="#" class="active"><i class="fas fa-th-large"></i> <span>Dashboard</span></a>
+
+        <div class="nav-dropdown">
+          <div class="dropdown-btn">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Academia</span>
+            <i class="fas fa-chevron-down icon-arrow"></i>
+          </div>
+          <div class="dropdown-content">
+            <a href="/horarios/mis-horarios"><i class="fas fa-clock"></i> Horario</a>
+            <a href="/cursos/mis-cursos"><i class="fas fa-book-open"></i> Cursos</a>
+            <a href="/calificaciones/mi-ranking"><i class="fas fa-chart-line"></i> Ranking</a>
+            <a href="/docentes/mis-docentes"><i class="fas fa-user-tie"></i> Docentes</a>
+          </div>
+        </div>
+
+        <a href="/calificaciones/mis-calificaciones"><i class="fas fa-star"></i> <span>Calificaciones</span></a>
+
+        <div class="nav-label">Gestión</div>
+        <a href="/pagos/mis-pagos"><i class="fas fa-wallet"></i> Pagos</a>
+        <a href="/configuracion"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+      </nav>
+    </div>
+
+    <a href="/login" class="btn-logout">
+      <i class="fas fa-sign-out-alt"></i> <span>Cerrar sesión</span>
+    </a>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="top-bar">
+      <label for="menu-toggle" class="hamburger-menu">
+        <i class="fas fa-bars"></i>
+      </label>
+
+      <div class="welcome-text">
+        <h1>Hola, <span th:text="${nombre}">Usuario</span></h1>
+        <p>Bienvenido al ecosistema académico Falcons</p>
+      </div>
+
+      <div class="user-pill">
+        <div class="user-info">
+          <strong th:text="${nombre} + ' ' + ${apellido}">Nombre Estudiante</strong>
+          <span>Estudiante</span>
+        </div>
+        <img th:src="'https://ui-avatars.com/api/?name=' + ${nombre} + '+' + ${apellido} + '&background=4318ff&color=fff&bold=true'" alt="Avatar">
+      </div>
+    </header>
+
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon bg-blue-light"><i class="fas fa-chart-bar"></i></div>
+        <div class="stat-data">
+          <p>Tu puntaje</p>
+          <h2 th:text="${puntaje}">0</h2>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon bg-green-light"><i class="fas fa-globe-americas"></i></div>
+        <div class="stat-data">
+          <p>Ranking</p>
+          <h2><span th:text="${ranking}">0</span>° <small>de <span th:text="${totalEstudiantes}">0</span></small></h2>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon bg-pink-light"><i class="fas fa-calendar-check"></i></div>
+        <div class="stat-data">
+          <p>Próximo examen</p>
+          <h2 class="course-name" th:text="${proximoCurso}">Cargando...</h2>
+          <span class="exam-date" th:text="${fechaExamen}">--/--</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="dashboard-body">
+
+      <div class="body-left">
+        <section class="chart-card">
+          <div class="card-header">
+            <h3>Progreso Académico</h3>
+            <span class="badge-status">Actualizado</span>
+          </div>
+          <div class="canvas-wrapper">
+            <canvas id="progresoChart"></canvas>
+          </div>
+        </section>
+      </div>
+
+      <div class="body-right">
+        <section class="quick-access">
+          <h3>Accesos directos</h3>
+          <div class="quick-cards">
+            <div class="q-item">
+              <div class="q-icon bg-blue"><i class="fas fa-laptop-code"></i></div>
+              <h4>Aula Virtual</h4>
+            </div>
+            <div class="q-item">
+              <div class="q-icon bg-green"><i class="fas fa-file-pdf"></i></div>
+              <h4>Boletas</h4>
+            </div>
+            <div class="q-item">
+              <div class="q-icon bg-orange"><i class="fas fa-medal"></i></div>
+              <h4>Certificados</h4>
+            </div>
+            <div class="q-item">
+              <div class="q-icon bg-pink"><i class="fas fa-question-circle"></i></div>
+              <h4>Soporte</h4>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+  /* Datos desde Spring Boot / Thymeleaf */
+  const progreso = [[${progreso}]] || [12, 14, 13, 17, 19];
+
+  new Chart(document.getElementById('progresoChart'), {
+    type: 'line',
+    data: {
+      labels: progreso.map((_, i) => 'Evaluación ' + (i + 1)),
+      datasets: [{
+        label: 'Rendimiento',
+        data: progreso,
+        borderColor: '#4318ff',
+        borderWidth: 3,
+        pointBackgroundColor: '#4318ff',
+        pointBorderColor: '#ffffff',
+        pointHoverRadius: 8,
+        backgroundColor: 'rgba(67, 24, 255, 0.08)',
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#2b3674',
+          titleFont: { family: 'Plus Jakarta Sans', size: 14 },
+          bodyFont: { family: 'Plus Jakarta Sans', size: 13 },
+          padding: 12,
+          cornerRadius: 10
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: '#e9edf7', drawBorder: false },
+          ticks: { font: { family: 'Plus Jakarta Sans', weight: '600' } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { family: 'Plus Jakarta Sans', weight: '600' } }
+        }
+      }
+    }
+  });
+</script>
+</body>
+</html>

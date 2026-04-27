@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudiantes | Falcons Admin</title>
+    <link rel="stylesheet" href="/Admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-top">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>FALCONS ADMIN</span>
+            </div>
+
+            <button class="mobile-close" onclick="toggleMenu()">&times;</button>
+
+            <nav class="nav-links">
+                <div class="nav-label">Core</div>
+                <a href="/dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a>
+
+                <div class="nav-label">Gestión</div>
+                <div class="nav-dropdown">
+                    <div class="dropdown-btn">
+                        <i class="fas fa-users"></i> <span>Usuarios</span>
+                        <i class="fas fa-chevron-down icon-arrow"></i>
+                    </div>
+                    <div class="dropdown-content">
+                        <a href="/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a>
+                        <a href="/docentes"><i class="fas fa-chalkboard-teacher"></i> Docentes</a>
+                        <a href="/tutores"><i class="fas fa-user-shield"></i> Tutores</a>
+                        <a href="/egresados"><i class="fas fa-user-check"></i> Egresados</a>
+                    </div>
+                </div>
+
+                <div class="nav-dropdown">
+                    <div class="dropdown-btn">
+                        <i class="fas fa-book"></i> <span>Académico</span>
+                        <i class="fas fa-chevron-down icon-arrow"></i>
+                    </div>
+                    <div class="dropdown-content">
+                        <a href="/cursos"><i class="fas fa-book-open"></i> Cursos</a>
+                        <a href="/horarios"><i class="fas fa-clock"></i> Horarios</a>
+                        <a href="/ciclos"><i class="fas fa-sync-alt"></i> Ciclos</a>
+                        <a href="/examenes"><i class="fas fa-file-alt"></i> Exámenes</a>
+                        <a href="/calificaciones"><i class="fas fa-star"></i> Calificaciones</a>
+                        <a href="/salones"><i class="fas fa-school"></i> Salones</a>
+                        <a href="/locales"><i class="fas fa-map-marker-alt"></i> Sedes</a>
+                    </div>
+                </div>
+
+                <div class="nav-label">Procesos</div>
+                <a href="/prematriculas"><i class="fas fa-file-signature"></i> <span>Prematrícula</span></a>
+                <a href="/asistencia"><i class="fas fa-clipboard-check"></i> <span>Asistencia</span></a>
+                <a href="/pagos"><i class="fas fa-credit-card"></i> <span>Pagos</span></a>
+            </nav>
+        </div>
+
+        <a href="/logout" class="btn-logout">
+            <i class="fas fa-power-off"></i> <span>Cerrar Sistema</span>
+        </a>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <button class="hamburger-btn" onclick="toggleMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Gestión de Estudiantes</h1>
+            </div>
+            <div class="user-pill">
+                <div class="user-info">
+                    <strong>Administrador</strong>
+                    <span>Sistemas</span>
+                </div>
+                <div class="admin-avatar">A</div>
+            </div>
+        </header>
+
+        <div th:if="${success}" id="successOverlay" class="custom-alert alert-success show">
+            <div class="alert-content">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}"></span>
+            </div>
+        </div>
+
+        <div th:if="${error}" id="errorOverlay" class="custom-alert alert-error show">
+            <div class="alert-content">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span th:text="${error}"></span>
+                <button onclick="this.parentElement.parentElement.style.display='none'" class="close-alert">&times;</button>
+            </div>
+        </div>
+
+        <div class="table-actions">
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="buscarDni" placeholder="Buscar por DNI...">
+                <button onclick="buscar()">Buscar</button>
+            </div>
+            <button class="btn-add" onclick="abrirModal()">
+                <i class="fas fa-plus"></i> Matricular Estudiante
+            </button>
+        </div>
+
+        <div class="chart-card table-wrapper">
+            <table>
+                <thead>
+                <tr>
+                    <th>DNI</th>
+                    <th>Nombre Completo</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${estudiantes}">
+                    <td th:text="${e.usuario.dni}" class="font-bold" data-label="DNI"></td>
+                    <td th:text="${e.usuario.nombres + ' ' + e.usuario.apellidos}" data-label="Nombre"></td>
+                    <td class="actions-cell">
+                        <button class="btn-icon view" title="Ver Detalle" th:data-id="${e.id}" onclick="verMas(this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-icon edit" title="Editar" th:data-id="${e.id}" th:data-dni="${e.usuario.dni}" th:data-nombres="${e.usuario.nombres}" th:data-apellidos="${e.usuario.apellidos}" th:data-email="${e.usuario.email}" th:data-telefono="${e.usuario.telefono}" th:data-direccion="${e.usuario.direccion}" th:data-fechanacimiento="${e.fechaNacimiento}" th:data-telefonoest="${e.telefono}" th:data-apoderado="${e.numeroApoderado}" th:data-direccionest="${e.direccion}" th:data-salonid="${e.salon != null ? e.salon.id : ''}" onclick="abrirEditar(this)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <a th:href="@{/estudiantes/eliminar/{id}(id=${e.id})}" class="btn-icon delete" title="Eliminar" onclick="return confirm('¿Seguro que deseas eliminar este estudiante?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<div id="modalEstudiante" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-plus"></i> Matricular Estudiante</h2>
+            <button class="close-modal" onclick="cerrarModal()">&times;</button>
+        </div>
+        <form method="post" action="/estudiantes/guardar" onsubmit="return validarFormulario()" class="grid-form">
+            <div class="form-section">
+                <label><i class="fas fa-id-card"></i> Datos del Usuario</label>
+                <div class="input-group">
+                    <div style="width:100%">
+                        <input type="text" id="dni" name="usuario.dni" placeholder="DNI (8 dígitos)" maxlength="8" required>
+                        <div id="dniError" class="error-msg"></div>
+                    </div>
+                    <input type="email" name="usuario.email" placeholder="Email Institucional" required>
+                </div>
+                <div class="input-group">
+                    <input type="text" name="usuario.nombres" placeholder="Nombres" required>
+                    <input type="text" name="usuario.apellidos" placeholder="Apellidos" required>
+                </div>
+                <div class="input-group">
+                    <input type="text" name="usuario.telefono" placeholder="Teléfono" required>
+                    <input type="text" name="usuario.direccion" placeholder="Dirección" required>
+                </div>
+                <input type="hidden" name="usuario.rol" value="ESTUDIANTE">
+            </div>
+            <div class="form-section">
+                <label><i class="fas fa-info-circle"></i> Datos del Estudiante</label>
+                <div class="input-group">
+                    <input type="date" name="fechaNacimiento" required>
+                    <select name="salon.id" required>
+                        <option value="">Selecciona salón</option>
+                        <option th:each="s : ${salones}" th:value="${s.id}" th:text="${s.nombre}"></option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <input type="text" name="telefono" placeholder="Teléfono personal">
+                    <input type="text" name="numeroApoderado" placeholder="Tel. Apoderado">
+                </div>
+                <input type="text" name="direccion" placeholder="Dirección residencia actual">
+            </div>
+            <button type="submit" class="btn-submit">💾 Guardar Matrícula</button>
+        </form>
+    </div>
+</div>
+
+<div id="modalEditar" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2><i class="fas fa-edit"></i> Editar Estudiante</h2>
+            <button class="close-modal" onclick="cerrarEditar()">&times;</button>
+        </div>
+        <form id="formEditar" method="post" class="grid-form">
+            <input type="hidden" id="editId" name="id">
+            <div class="form-section">
+                <label>Datos del Usuario</label>
+                <div class="input-group">
+                    <input type="text" id="editDni" name="usuario.dni" required placeholder="DNI">
+                    <input type="email" id="editEmail" name="usuario.email" required placeholder="Email">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="editNombres" name="usuario.nombres" required placeholder="Nombres">
+                    <input type="text" id="editApellidos" name="usuario.apellidos" required placeholder="Apellidos">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="editTelefono" name="usuario.telefono" required placeholder="Teléfono">
+                    <input type="text" id="editDireccion" name="usuario.direccion" required placeholder="Dirección">
+                </div>
+            </div>
+            <div class="form-section">
+                <label>Datos del Estudiante</label>
+                <div class="input-group">
+                    <input type="date" id="editFechaNacimiento" name="fechaNacimiento">
+                    <select id="editSalon" name="salon.id" required>
+                        <option value="">Selecciona salón</option>
+                        <option th:each="s : ${salones}" th:value="${s.id}" th:text="${s.nombre}"></option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="editTelefonoEst" name="telefono" placeholder="Teléfono personal">
+                    <input type="text" id="editApoderado" name="numeroApoderado" placeholder="Tel. Apoderado">
+                </div>
+                <input type="text" id="editDireccionEst" name="direccion" placeholder="Dirección residencia">
+            </div>
+            <button type="submit" class="btn-submit">Actualizar Datos</button>
+        </form>
+    </div>
+</div>
+
+<div id="modalVer" class="modal-overlay">
+    <div class="modal-card detail-card">
+        <div class="modal-header">
+            <h2><i class="fas fa-id-badge"></i> Expediente Estudiantil</h2>
+            <button class="close-modal" onclick="cerrarVer()">&times;</button>
+        </div>
+        <div class="profile-header">
+            <div class="profile-avatar" id="avatarLetra">S</div>
+            <h3 id="nombreCompleto"></h3>
+            <span class="badge-status">Activo</span>
+        </div>
+        <div class="detail-grid">
+            <div class="detail-item"><i class="fas fa-fingerprint"></i> <div><span>DNI</span><p id="dniV"></p></div></div>
+            <div class="detail-item"><i class="fas fa-envelope"></i> <div><span>Correo</span><p id="email"></p></div></div>
+            <div class="detail-item"><i class="fas fa-phone"></i> <div><span>Teléfono</span><p id="telefono"></p></div></div>
+            <div class="detail-item"><i class="fas fa-users"></i> <div><span>Apoderado</span><p id="apoderado"></p></div></div>
+            <div class="detail-item"><i class="fas fa-birthday-cake"></i> <div><span>Nacimiento</span><p id="fechaNacimiento"></p></div></div>
+            <div class="detail-item"><i class="fas fa-map-marker-alt"></i> <div><span>Dirección</span><p id="direccion"></p></div></div>
+            <div class="detail-item"><i class="fas fa-user-circle"></i> <div><span>Usuario</span><p id="usuario"></p></div></div>
+            <div class="detail-item">
+                <i class="fas fa-lock"></i>
+                <div>
+                    <span>Password</span>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <p id="password" style="color:var(--primary); font-weight: bold;">********</p>
+                        <i class="fas fa-eye" id="togglePassBtn" onclick="togglePass()" style="cursor:pointer; color:var(--text-grey);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button class="btn-submit" onclick="resetPassword()" style="background:#6f42c1">Reiniciar Contraseña</button>
+            <button class="btn-submit" onclick="cerrarVer()" style="background:var(--text-grey)">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // CONTROL DEL MENÚ LATERAL (HAMBURGUESA)
+    function toggleMenu(){
+        document.getElementById("sidebar").classList.toggle("active");
+        document.getElementById("sidebarOverlay").classList.toggle("active");
+    }
+
+    function buscar(){
+        let dni = document.getElementById("buscarDni").value;
+        window.location.href = "/estudiantes?dni=" + dni;
+    }
+
+    function abrirModal(){ document.getElementById("modalEstudiante").style.display = "flex"; }
+    function cerrarModal(){ document.getElementById("modalEstudiante").style.display = "none"; }
+
+    function verMas(btn) {
+        const id = btn.dataset.id;
+        fetch("/estudiantes/detalle/" + id)
+            .then(res => res.json())
+            .then(e => {
+                document.getElementById("modalVer").style.display = "flex";
+                document.getElementById("nombreCompleto").innerText = (e.usuario?.nombres || "") + " " + (e.usuario?.apellidos || "");
+                document.getElementById("avatarLetra").innerText = e.usuario?.nombres?.charAt(0) || "S";
+                document.getElementById("dniV").innerText = e.usuario?.dni || "";
+                document.getElementById("email").innerText = e.usuario?.email || "";
+                document.getElementById("telefono").innerText = e.usuario?.telefono || "";
+                document.getElementById("direccion").innerText = e.usuario?.direccion || "";
+                document.getElementById("apoderado").innerText = e.numeroApoderado || "No registrado";
+                document.getElementById("fechaNacimiento").innerText = e.fechaNacimiento || "No registrado";
+                document.getElementById("usuario").innerText = e.usuario?.username || e.usuario?.dni;
+                window.passReal = e.usuario?.password;
+                window.usuarioId = e.usuario?.id; // ID real del usuario para el reset
+
+                document.getElementById("password").innerText = "********";
+                document.getElementById("togglePassBtn").className = "fas fa-eye";
+            });
+    }
+
+    function cerrarVer() { document.getElementById("modalVer").style.display = "none"; }
+
+    function togglePass(){
+        let p = document.getElementById("password");
+        let btn = document.getElementById("togglePassBtn");
+        if(p.innerText === "********"){
+            p.innerText = window.passReal || "No disponible";
+            btn.className = "fas fa-eye-slash";
+        } else {
+            p.innerText = "********";
+            btn.className = "fas fa-eye";
+        }
+    }
+
+    function resetPassword(){
+        if(!window.usuarioId) return alert("❌ No se encontró ID");
+        fetch("/usuarios/reset/" + window.usuarioId, { method: "POST" })
+            .then(res => res.text())
+            .then(pass => {
+                alert("🔐 Nueva contraseña: " + pass);
+                document.getElementById("password").innerText = pass;
+                window.passReal = pass;
+                document.getElementById("togglePassBtn").className = "fas fa-eye-slash";
+            });
+    }
+
+    function validarFormulario(){
+        let dni = document.getElementById("dni").value;
+        if(dni.length !== 8){
+            document.getElementById("dniError").innerText = "⚠️ El DNI debe tener 8 dígitos";
+            return false;
+        }
+        return true;
+    }
+
+    function abrirEditar(btn) {
+        document.getElementById("modalEditar").style.display = "flex";
+        const id = btn.dataset.id;
+        document.getElementById("formEditar").action = "/estudiantes/actualizar/" + id;
+        document.getElementById("editId").value = id;
+        document.getElementById("editDni").value = btn.dataset.dni || "";
+        document.getElementById("editNombres").value = btn.dataset.nombres || "";
+        document.getElementById("editApellidos").value = btn.dataset.apellidos || "";
+        document.getElementById("editEmail").value = btn.dataset.email || "";
+        document.getElementById("editTelefono").value = btn.dataset.telefono || "";
+        document.getElementById("editDireccion").value = btn.dataset.direccion || "";
+        document.getElementById("editTelefonoEst").value = btn.dataset.telefonoest || "";
+        document.getElementById("editApoderado").value = btn.dataset.apoderado || "";
+        document.getElementById("editDireccionEst").value = btn.dataset.direccionest || "";
+        document.getElementById("editFechaNacimiento").value = btn.dataset.fechanacimiento || "";
+        document.getElementById("editSalon").value = btn.dataset.salonid || "";
+    }
+
+    function cerrarEditar(){ document.getElementById("modalEditar").style.display = "none"; }
+
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal-overlay')) event.target.style.display = 'none';
+    }
+</script>
+
+</body>
+</html>

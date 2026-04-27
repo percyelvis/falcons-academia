@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Horarios Tutor</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body{
+            font-family: Arial;
+            background:#f5f6fa;
+        }
+
+        .rooms-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:16px;
+            padding:20px;
+        }
+
+        .room-card{
+            background:#fff;
+            padding:18px;
+            border-radius:12px;
+            cursor:pointer;
+            box-shadow:0 6px 18px rgba(0,0,0,0.1);
+        }
+
+        .badge{
+            background:#6366f1;
+            color:#fff;
+            padding:4px 8px;
+            border-radius:6px;
+            font-size:12px;
+        }
+
+        /* MODAL */
+        .modal-overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.6);
+            display:none;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .modal-box{
+            background:#fff;
+            width:600px;
+            max-width:95%;
+            padding:20px;
+            border-radius:12px;
+        }
+
+        .horario-card{
+            background:#eef2ff;
+            padding:12px;
+            border-radius:10px;
+            margin-bottom:10px;
+        }
+
+        .tag{
+            background:#10b981;
+            color:white;
+            padding:3px 6px;
+            font-size:12px;
+            border-radius:5px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2 style="padding:20px;">Salones</h2>
+
+<div class="rooms-grid">
+
+    <div class="room-card"
+         th:each="s : ${salones}"
+         th:attr="data-id=${s.id}, data-nombre=${s.nombre}"
+         onclick="openModal(this)">
+
+        <span class="badge">SALÓN</span>
+        <h3 th:text="${s.nombre}"></h3>
+
+        <p>Ver horarios</p>
+    </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-box">
+
+        <h3 id="titulo">Horarios</h3>
+
+        <div id="contenido">Cargando...</div>
+
+    </div>
+</div>
+
+<script>
+
+    function openModal(el){
+
+        const id = el.dataset.id;
+        const nombre = el.dataset.nombre;
+
+        document.getElementById("titulo").innerText = "Horarios - " + nombre;
+        document.getElementById("modal").style.display = "flex";
+
+        const contenedor = document.getElementById("contenido");
+        contenedor.innerHTML = "Cargando...";
+
+        // ✅ CORRECTO (JSON endpoint)
+        fetch("/tutores/tutor/salon/" + id + "/horarios-json")
+            .then(r => r.json())
+            .then(data => {
+
+                if(!data || data.length === 0){
+                    contenedor.innerHTML = "<p>No hay horarios</p>";
+                    return;
+                }
+
+                let html = "";
+
+                data.forEach(h => {
+
+                    html += `
+                    <div class="horario-card">
+                        <span class="tag">Horario</span>
+                        <p><b>${h.curso?.nombre ?? 'Sin curso'}</b></p>
+                        <p>Docente: ${h.curso?.docente?.nombre ?? 'Sin docente'}</p>
+                        <p>${h.dia} - ${h.horaInicio} a ${h.horaFin}</p>
+                    </div>
+                `;
+                });
+
+                contenedor.innerHTML = html;
+            })
+            .catch(err => {
+                console.log(err);
+                contenedor.innerHTML = "Error cargando horarios";
+            });
+    }
+
+    function closeModal(e){
+        if(!e || e.target.id === "modal"){
+            document.getElementById("modal").style.display = "none";
+        }
+    }
+
+</script>
+
+</body>
+</html>
