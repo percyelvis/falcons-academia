@@ -126,7 +126,7 @@
         <div class="course-card" th:each="p : ${pagos}">
 
           <h3>
-            💳 Pago #<span th:text="${p.id}">1</span>
+            Pago <span th:text="${p.id}"></span>
           </h3>
 
           <p>
@@ -137,7 +137,7 @@
           <p>
             <i class="fas fa-calendar"></i>
             Fecha:
-            <span th:text="${p.fechaPago}">--</span>
+            <span th:text="${p.fechaPago}">- -</span>
           </p>
 
           <p>

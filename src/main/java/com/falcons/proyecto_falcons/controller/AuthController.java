@@ -76,7 +76,7 @@ public class AuthController {
             }
 
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error en login");
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/login";
         }
     }
@@ -95,14 +95,31 @@ public class AuthController {
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
 
-        model.addAttribute("totalEstudiantes",
-                estudianteService.listarEstudiantes().size());
+        int totalEstudiantes = 0;
+        int totalDocentes = 0;
+        int totalCursos = 0;
 
-        model.addAttribute("totalDocentes",
-                docenteService.listarDocentes().size());
+        try {
+            totalEstudiantes = estudianteService.listarEstudiantes().size();
+        } catch (Exception e) {
+            System.out.println("Error estudiantes: " + e.getMessage());
+        }
 
-        model.addAttribute("totalCursos",
-                cursoService.listarCursos().size());
+        try {
+            totalDocentes = docenteService.listarDocentes().size();
+        } catch (Exception e) {
+            System.out.println("Error docentes: " + e.getMessage());
+        }
+
+        try {
+            totalCursos = cursoService.listarCursos().size();
+        } catch (Exception e) {
+            System.out.println("Error cursos: " + e.getMessage());
+        }
+
+        model.addAttribute("totalEstudiantes", totalEstudiantes);
+        model.addAttribute("totalDocentes", totalDocentes);
+        model.addAttribute("totalCursos", totalCursos);
 
         return "adminstrador/dashboard";
     }

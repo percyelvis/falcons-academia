@@ -215,4 +215,144 @@ body{
         width:100%;
         max-width:350px;
     }
+
+}
+
+/* --- MODAL Y FONDO --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.7); /* Azul oscuro traslúcido */
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    background: #ffffff;
+    padding: 2.5rem;
+    border-radius: 24px;
+    text-align: center;
+    width: 90%;
+    max-width: 380px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden; /* Para que la barra de progreso no se salga */
+}
+
+/* --- ICONO DE ADVERTENCIA ESTILIZADO --- */
+.warning-icon-container {
+    width: 80px;
+    height: 80px;
+    background: #fef2f2;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 20px;
+    border: 3px solid #ef4444;
+}
+
+.warning-icon {
+    color: #ef4444;
+    font-size: 45px;
+    font-weight: bold;
+    font-family: 'Poppins', sans-serif;
+    animation: pulseIcon 1.5s infinite;
+}
+
+/* --- TEXTOS --- */
+.modal-content h3 {
+    color: #1e293b;
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+.modal-content p {
+    color: #64748b;
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.timer-text {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-bottom: 15px;
+}
+
+/* --- BARRA DE PROGRESO --- */
+.progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ef4444, #f87171);
+    width: 100%;
+    /* La animación de la barra dura 4 segundos */
+    animation: shrinkBar 4s linear forwards;
+}
+
+/* --- ANIMACIONES --- */
+
+/* Salto de entrada elástico */
+@keyframes popIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    60% { transform: scale(1.08); opacity: 1; }
+    100% { transform: scale(1); }
+}
+
+.animate-pop {
+    animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Pulso para el icono */
+@keyframes pulseIcon {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+/* Reducción de la barra de tiempo */
+@keyframes shrinkBar {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+
+/* loader ce carga*/
+
+.loader-overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    color: white;
+}
+
+.loader {
+    border: 5px solid #fff;
+    border-top: 5px solid #2d5bff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: girar 1s linear infinite;
+}
+
+@keyframes girar {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

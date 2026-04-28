@@ -16,7 +16,6 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-top">
             <div class="logo">
-                <i class="fas fa-shield-alt"></i>
                 <span>FALCONS ADMIN</span>
             </div>
 
@@ -33,7 +32,7 @@
                         <i class="fas fa-chevron-down icon-arrow"></i>
                     </div>
                     <div class="dropdown-content">
-                        <a href="/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a>
+                        <a href="/estudiantes" class="active"><i class="fas fa-user-graduate"></i> Estudiantes</a>
                         <a href="/docentes"><i class="fas fa-chalkboard-teacher"></i> Docentes</a>
                         <a href="/tutores"><i class="fas fa-user-shield"></i> Tutores</a>
                         <a href="/egresados"><i class="fas fa-user-check"></i> Egresados</a>
@@ -103,7 +102,7 @@
         <div class="table-actions">
             <div class="search-container">
                 <i class="fas fa-search"></i>
-                <input type="text" id="buscarDni" placeholder="Buscar por DNI...">
+                <input type="text" id="buscarDni" placeholder="Buscar por DNI..." onkeyup="filtrarTabla()">
                 <button onclick="buscar()">Buscar</button>
             </div>
             <button class="btn-add" onclick="abrirModal()">
@@ -363,6 +362,25 @@
 
     window.onclick = function(event) {
         if (event.target.classList.contains('modal-overlay')) event.target.style.display = 'none';
+    }
+
+    function filtrarTabla() {
+        let input = document.getElementById("buscarDni").value.toLowerCase();
+        let filas = document.querySelectorAll("tbody tr");
+
+        filas.forEach(fila => {
+            let dni = fila.querySelector("td[data-label='DNI']");
+
+            if (!dni) return;
+
+            let texto = dni.textContent.toLowerCase();
+
+            if (texto.includes(input)) {
+                fila.style.display = "";
+            } else {
+                fila.style.display = "none";
+            }
+        });
     }
 </script>
 

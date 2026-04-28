@@ -13,7 +13,7 @@
 
 <!-- ================= HEADER ================= -->
 <header class="header">
-    <a class="logo" href="http://localhost:8080/">
+    <a class="logo" href="/">
         <img src="/logo.png" alt="Falcons">
     </a>
 
@@ -40,11 +40,6 @@
 
         <h2>Acceso al Sistema</h2>
 
-        <!-- MENSAJES -->
-        <p class="message error" th:if="${param.error}">
-            Credenciales incorrectas ❌
-        </p>
-
         <!-- ================= FORM CORRECTO ================= -->
         <form method="POST" action="/login">
 
@@ -65,7 +60,27 @@
 
     </div>
 </section>
+</section>
 
+<!-- MODAL GLOBAL -->
+<div id="modalError" class="modal-overlay" th:if="${error}">
+    <div class="modal-content animate-pop">
+        <div class="warning-icon-container">
+            <div class="warning-icon">!</div>
+        </div>
+
+        <h3>Acceso Denegado</h3>
+        <p th:text="${error}"></p>
+
+        <div class="timer-text">Reintentando en unos segundos...</div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
 <!-- ================= FOOTER ================= -->
 <footer class="footer">
     <p>© 2026 Falcons Academy - Todos los derechos reservados</p>
@@ -76,7 +91,44 @@
     document.getElementById("hamburguesa").onclick = function(){
         document.getElementById("nav").classList.toggle("active");
     }
+
+    function cerrarModal() {
+        const modal = document.getElementById("modalError");
+        // Añadimos una transición de salida rápida
+        modal.style.opacity = "0";
+        setTimeout(() => {
+            modal.style.display = "none";
+        }, 300);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const modal = document.getElementById("modalError");
+
+        if (modal) {
+            // Esperar 4 segundos (4000ms) antes de cerrar
+            setTimeout(() => {
+                // Animación de salida suave
+                modal.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+                modal.style.opacity = "0";
+                modal.style.transform = "translateY(-20px)";
+
+                setTimeout(() => {
+                    modal.style.display = "none";
+
+                    // OPCIONAL: Limpia el parámetro 'error' de la URL sin recargar
+                    const url = new URL(window.location);
+                    url.searchParams.delete('error');
+                    window.history.replaceState({}, document.title, url);
+
+                }, 500);
+            }, 4000);
+        }
+    });
+
+
 </script>
+
+
 
 </body>
 </html>

@@ -16,7 +16,6 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-top">
       <div class="logo">
-        <i class="fas fa-shield-alt"></i>
         <span>FALCONS ADMIN</span>
       </div>
 
@@ -119,10 +118,15 @@
             <td th:text="${p.correo}"></td>
             <td>
               <div class="actions-cell">
+                <button class="btn-icon edit" title="Matricular"
+                        th:attr="onclick=|confirmarMatricula('${p.id}')|">
+                  <i class="fas fa-user-plus"></i>
+                </button>
                 <button class="btn-icon view" title="Ver"
                         th:attr="onclick=|verPre('${p.nombres}','${p.apellidos}','${p.dni}','${p.telefono}','${p.correo}')|">
                   <i class="fas fa-eye"></i>
                 </button>
+
                 <a th:href="@{'/prematriculas/eliminar/' + ${p.id}}"
                    class="btn-icon delete" title="Eliminar"
                    onclick="return confirm('¿Desea eliminar este registro?')">
@@ -188,12 +192,83 @@
   </div>
 </div>
 
+<div id="modalConfirmar" class="modal-overlay">
+  <div class="modal-card" style="text-align:center; max-width:400px;">
+
+    <h2>¿Matricular estudiante?</h2>
+    <p>El postulante será registrado como estudiante en el sistema.</p>
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="btn-submit" style="flex:1; background:#16a34a;"
+              onclick="ejecutarMatricula()">
+        Sí, Matricular
+      </button>
+
+      <button class="btn-submit" style="flex:1; background:#e5e7eb; color:#333;"
+              onclick="closeModal('modalConfirmar')">
+        Cancelar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+
+<div id="modalMatricula" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2><i class="fas fa-user-graduate"></i> Matricular Estudiante</h2>
+      <button class="close-modal" onclick="cerrarMatricula()">&times;</button>
+    </div>
+
+    <div style="text-align:center; padding:20px;">
+      <p style="font-size:18px;">¿Deseas matricular a este postulante como estudiante?</p>
+      <p style="color:var(--primary); font-weight:700;" id="nombreMatricula">-</p>
+    </div>
+
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button class="btn-submit" onclick="confirmarMatricula()">
+        Sí, Matricular
+      </button>
+      <button class="btn-submit" style="background:var(--text-grey)" onclick="cerrarMatricula()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="modalSuccess" class="modal-overlay">
+  <div class="modal-card" style="text-align:center; max-width:400px;">
+
+    <div style="font-size:50px; color:#16a34a;">
+      <i class="fas fa-check-circle"></i>
+    </div>
+
+    <h2 style="margin-top:10px;">¡Matriculado correctamente!</h2>
+    <p>El estudiante fue registrado en el sistema.</p>
+
+    <button class="btn-submit" style="margin-top:15px; width:100%; background:#16a34a;"
+            onclick="closeModal('modalSuccess')">
+      Aceptar
+    </button>
+
+  </div>
+</div>
+
 <script>
+
+  /* =========================
+     MENU
+  ========================= */
   function toggleMenu() {
     document.getElementById("sidebar").classList.toggle("active");
     document.getElementById("sidebarOverlay").classList.toggle("active");
   }
 
+  /* =========================
+     MODALES BASE
+  ========================= */
   function openModal(id) {
     document.getElementById(id).style.display = "flex";
   }
@@ -202,13 +277,16 @@
     document.getElementById(id).style.display = "none";
   }
 
-  /* VER DETALLE - CORREGIDO */
+  /* =========================
+     VER DETALLE (FUNCIONA YA)
+  ========================= */
   function verPre(nombres, apellidos, dni, telefono, correo) {
-    // Asignar nombres combinados al encabezado
-    document.getElementById("ver-nombres-completos").innerText = nombres + " " + apellidos;
+
+    document.getElementById("ver-nombres-completos").innerText =
+            nombres + " " + apellidos;
+
     document.getElementById("ver-dni-sub").innerText = "DNI: " + dni;
 
-    // Asignar campos individuales
     document.getElementById("ver-nombres").innerText = nombres;
     document.getElementById("ver-apellidos").innerText = apellidos;
     document.getElementById("ver-telefono").innerText = telefono;
@@ -217,7 +295,9 @@
     openModal("modalVer");
   }
 
-  /* FILTRO DE BUSQUEDA */
+  /* =========================
+     FILTRO
+  ========================= */
   function filterTable() {
     let input = document.getElementById("searchInput");
     let filter = input.value.toUpperCase();
@@ -225,18 +305,71 @@
     let tr = table.getElementsByTagName("tr");
 
     for (let i = 1; i < tr.length; i++) {
-      let rowText = tr[i].textContent || tr[i].innerText;
-      tr[i].style.display = rowText.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+      let text = tr[i].textContent || tr[i].innerText;
+      tr[i].style.display = text.toUpperCase().indexOf(filter) > -1 ? "" : "none";
     }
   }
 
-  /* CERRAR AL TOCAR AFUERA */
-  window.onclick = function(event) {
-    if (event.target.className === 'modal-overlay') {
-      event.target.style.display = "none";
-    }
+  /* =========================
+     🔥 MATRÍCULA (ARREGLADO)
+  ========================= */
+
+  let idSeleccionado = null;
+
+  // ESTA ES LA QUE TE FALTABA
+  function confirmarMatricula(id) {
+    idSeleccionado = id;
+    openModal("modalConfirmar");
   }
+
+  function ejecutarMatricula() {
+
+    if (!idSeleccionado) {
+      alert("❌ Error: ID no válido");
+      return;
+    }
+
+    fetch("/estudiantes/desde-prematricula/" + idSeleccionado, {
+      method: "POST"
+    })
+            .then(res => {
+              if (res.ok) {
+
+                closeModal("modalConfirmar");
+
+                // 🔥 mostrar modal bonito en vez de alert
+                openModal("modalSuccess");
+
+                // opcional: recargar después de 2 segundos
+                setTimeout(() => {
+                  location.reload();
+                }, 2000);
+
+              } else {
+                alert("❌ No se pudo matricular");
+              }
+            })
+            .catch(err => {
+              console.error(err);
+              alert("❌ Error del servidor");
+            });
+  }
+
+  /* =========================
+     CERRAR MODALES CLICK FUERA
+  ========================= */
+  window.addEventListener("click", function(e) {
+
+    const confirm = document.getElementById("modalConfirmar");
+    const ver = document.getElementById("modalVer");
+
+    if (e.target === confirm) closeModal("modalConfirmar");
+    if (e.target === ver) closeModal("modalVer");
+
+  });
+
 </script>
+
 
 </body>
 </html>

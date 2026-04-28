@@ -16,7 +16,6 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-top">
             <div class="logo">
-                <i class="fas fa-shield-alt"></i>
                 <span>FALCONS ADMIN</span>
             </div>
 
@@ -46,7 +45,7 @@
                         <i class="fas fa-chevron-down icon-arrow"></i>
                     </div>
                     <div class="dropdown-content">
-                        <a href="/cursos"><i class="fas fa-book-open"></i> Cursos</a>
+                        <a href="/cursos" class="active"><i class="fas fa-book-open"></i> Cursos</a>
                         <a href="/horarios"><i class="fas fa-clock"></i> Horarios</a>
                         <a href="/ciclos"><i class="fas fa-sync-alt"></i> Ciclos</a>
                         <a href="/examenes"><i class="fas fa-file-alt"></i> Exámenes</a>
@@ -129,11 +128,10 @@
                                         onclick="abrirEditar(this)">
                                     <i class="fas fa-pen"></i>
                                 </button>
-                                <a th:href="@{/cursos/eliminar/{id}(id=${c.id})}"
-                                   class="btn-icon delete"
-                                   onclick="return confirm('¿Está seguro de eliminar este curso?')">
+                                <button class="btn-icon delete"
+                                        th:attr="onclick=|abrirEliminar(${c.id})|">
                                     <i class="fas fa-trash"></i>
-                                </a>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -203,6 +201,35 @@
     </div>
 </div>
 
+
+<div id="modalEliminar" class="modal-overlay">
+    <div class="modal-card" style="max-width: 400px; text-align: center;">
+
+        <div class="modal-header">
+            <h2>Eliminar Curso</h2>
+            <button class="close-modal" onclick="cerrarEliminar()">&times;</button>
+        </div>
+
+        <p style="margin: 20px 0;">
+            ¿Está seguro de eliminar este curso? Esta acción no se puede deshacer.
+        </p>
+
+        <div style="display:flex; gap:10px;">
+            <button class="btn-submit"
+                    style="background:#dc2626; flex:1;"
+                    onclick="confirmarEliminar()">
+                Eliminar
+            </button>
+
+            <button class="btn-submit"
+                    style="background:#e5e7eb; color:#000; flex:1;"
+                    onclick="cerrarEliminar()">
+                Cancelar
+            </button>
+        </div>
+
+    </div>
+</div>
 <script>
     function toggleMenu() {
         document.getElementById("sidebar").classList.toggle("active");
@@ -252,6 +279,55 @@
             event.target.style.display = "none";
         }
     }
+
+    let idCursoEliminar = null;
+
+    /* MENU */
+    function toggleMenu() {
+        document.getElementById("sidebar").classList.toggle("active");
+        document.getElementById("sidebarOverlay").classList.toggle("active");
+    }
+
+    /* MODALES GENERALES */
+    function cerrarEliminar() {
+        document.getElementById("modalEliminar").style.display = "none";
+    }
+
+    /* =========================
+       ELIMINAR CURSO
+    ========================= */
+
+    function abrirEliminar(id) {
+        idCursoEliminar = id;
+        document.getElementById("modalEliminar").style.display = "flex";
+    }
+
+    function confirmarEliminar() {
+
+        if (!idCursoEliminar) return;
+
+        fetch("/cursos/eliminar/" + idCursoEliminar, {
+            method: "GET"
+        })
+            .then(res => {
+                if (res.ok) {
+                    cerrarEliminar();
+                    location.reload();
+                } else {
+                    alert("No se pudo eliminar el curso");
+                }
+            })
+            .catch(() => {
+                alert("Error del servidor");
+            });
+    }
+
+    /* cerrar al hacer click fuera */
+    window.onclick = function(event) {
+        if (event.target.classList.contains("modal-overlay")) {
+            event.target.style.display = "none";
+        }
+    };
 </script>
 
 </body>

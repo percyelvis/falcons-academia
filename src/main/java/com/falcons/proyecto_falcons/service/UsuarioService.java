@@ -3,7 +3,6 @@ package com.falcons.proyecto_falcons.service;
 import com.falcons.proyecto_falcons.entity.Usuario;
 import com.falcons.proyecto_falcons.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,8 +14,6 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     // =========================
     // 🔥 CREAR USUARIO
@@ -39,13 +36,13 @@ public class UsuarioService {
             );
         }
 
-        // 🔥 PASSWORD AUTOMÁTICA (DNI + inicial nombre)
+        if (usuarioRepository.existsByUsername(usuario.getUsername()))
+            throw new IllegalArgumentException("Ya existe un username");
+
+        // 🔐 PASSWORD AUTOMÁTICA (SIN ENCRIPTAR)
         if (usuario.getPassword() == null || usuario.getPassword().isBlank()) {
             usuario.setPassword(generarPassword(usuario.getDni(), usuario.getNombres()));
         }
-
-        if (usuarioRepository.existsByUsername(usuario.getUsername()))
-            throw new IllegalArgumentException("Ya existe un username");
 
         return usuarioRepository.save(usuario);
     }
@@ -54,6 +51,7 @@ public class UsuarioService {
     // 🔐 GENERAR PASSWORD
     // =========================
     private String generarPassword(String dni, String nombres) {
+
         String inicial = "";
 
         if (nombres != null && !nombres.isBlank()) {
@@ -93,16 +91,17 @@ public class UsuarioService {
         u.setTelefono(usuarioActualizado.getTelefono() != null ? usuarioActualizado.getTelefono() : "");
         u.setDireccion(usuarioActualizado.getDireccion() != null ? usuarioActualizado.getDireccion() : "");
 
-        // ⚠️ IMPORTANTE: evitar null
+        // USERNAME
         if (usuarioActualizado.getUsername() != null && !usuarioActualizado.getUsername().isBlank()) {
             u.setUsername(usuarioActualizado.getUsername());
         }
 
-        // 🔐 password opcional
+        // PASSWORD (SIN ENCRIPTAR)
         if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().isBlank()) {
             u.setPassword(usuarioActualizado.getPassword());
         }
 
+        // ROL
         if (usuarioActualizado.getRol() != null && !usuarioActualizado.getRol().isBlank()) {
             u.setRol(usuarioActualizado.getRol());
         }
@@ -125,6 +124,7 @@ public class UsuarioService {
         Usuario u = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
+        // ✅ comparación simple
         if (!password.equals(u.getPassword())) {
             throw new IllegalArgumentException("Contraseña incorrecta");
         }
@@ -160,7 +160,7 @@ public class UsuarioService {
 
         String nueva = u.getDni() + u.getNombres().substring(0, 1).toUpperCase();
 
-        u.setPassword(encoder.encode(nueva));
+        u.setPassword(nueva);
 
         usuarioRepository.save(u);
 

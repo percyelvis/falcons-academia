@@ -77,4 +77,6 @@ public class UsuarioController {
     public String resetPassword(@PathVariable Long id) {
         return service.resetPassword(id);
     }
+
+
 }

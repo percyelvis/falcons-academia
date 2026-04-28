@@ -11,6 +11,11 @@
 </head>
 
 <body>
+<div id="flash-error" th:if="${param.error}"
+     th:attr="data-msg='Contraseña actual incorrecta'"></div>
+
+<div id="flash-success" th:if="${param.success}"
+     th:attr="data-msg='Contraseña actualizada correctamente'"></div>
 
 <div class="dashboard-wrapper">
   <input type="checkbox" id="menu-toggle" class="menu-toggle-input">
@@ -151,6 +156,7 @@
 
           </form>
 
+
         </div>
 
       </div>
@@ -159,6 +165,83 @@
 
   </main>
 </div>
+<!-- MODAL CONFIRMACIÓN CONTRASEÑA -->
+<!-- 🔔 MODAL CONFIRMACIÓN -->
+<div id="modalPassword" class="modal-pass">
 
+  <div class="modal-pass-box">
+
+    <!-- ICONO -->
+    <div id="modalIcon" class="modal-icon">
+      <i class="fas fa-check"></i>
+    </div>
+
+    <!-- TITULO -->
+    <h2 id="modalTitle">Mensaje</h2>
+
+    <!-- TEXTO -->
+    <p id="modalMessage">...</p>
+
+    <!-- BOTÓN -->
+    <button onclick="closeModal()" class="modal-btn">
+      Aceptar
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+  function showModal(type, message) {
+    const modal = document.getElementById("modalPassword");
+    const icon = document.getElementById("modalIcon");
+    const title = document.getElementById("modalTitle");
+    const text = document.getElementById("modalMessage");
+
+    modal.classList.add("show");
+    modal.classList.remove("error");
+
+    if (type === "success") {
+      icon.innerHTML = '<i class="fas fa-check"></i>';
+      title.textContent = "¡Contraseña actualizada!";
+    } else {
+      modal.classList.add("error");
+      icon.innerHTML = '<i class="fas fa-times"></i>';
+      title.textContent = "Error";
+    }
+
+    text.textContent = message;
+
+    // auto cerrar
+    setTimeout(() => {
+      closeModal();
+    }, 3000);
+  }
+
+  function closeModal() {
+    document.getElementById("modalPassword").classList.remove("show");
+  }
+
+  /* cerrar al hacer click fuera */
+  document.getElementById("modalPassword").addEventListener("click", function (e) {
+    if (e.target === this) {
+      closeModal();
+    }
+  });
+
+  /* auto mostrar desde backend (redirect ?error / ?success) */
+  window.addEventListener("DOMContentLoaded", () => {
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (urlParams.has("success")) {
+      showModal("success", "Contraseña actualizada correctamente");
+    }
+
+    if (urlParams.has("error")) {
+      showModal("error", "Contraseña actual incorrecta");
+    }
+  });
+</script>
 </body>
 </html>

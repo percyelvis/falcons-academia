@@ -16,7 +16,6 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-top">
       <div class="logo">
-        <i class="fas fa-shield-alt"></i>
         <span>FALCONS ADMIN</span>
       </div>
 
@@ -34,7 +33,7 @@
           </div>
           <div class="dropdown-content">
             <a href="/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a>
-            <a href="/docentes"><i class="fas fa-chalkboard-teacher"></i> Docentes</a>
+            <a href="/docentes" class="active"><i class="fas fa-chalkboard-teacher"></i> Docentes</a>
             <a href="/tutores"><i class="fas fa-user-shield"></i> Tutores</a>
             <a href="/egresados"><i class="fas fa-user-check"></i> Egresados</a>
           </div>
@@ -91,6 +90,13 @@
 
     <div class="chart-card">
       <div class="table-actions">
+        <div class="search-container" style="display:flex; gap:10px; align-items:center; margin-top:10px;">
+
+          <input type="text" id="buscarNombre" placeholder="Buscar por nombre..." onkeyup="filtrarDocentes()">
+
+          <input type="text" id="buscarEsp" placeholder="Buscar por especialidad..." onkeyup="filtrarDocentes()">
+
+        </div>
         <button class="btn-add" onclick="openModal('modalCrear')">
           <i class="fas fa-plus"></i> Nuevo Docente
         </button>
@@ -125,9 +131,9 @@
                         th:attr="onclick=|editarDocente('${d.id}','${d.nombre}','${d.especialidad}','${d.telefono}')|">
                   <i class="fas fa-pen"></i>
                 </button>
-                <a th:href="@{'/docentes/eliminar/' + ${d.id}}"
-                   class="btn-icon delete" title="Eliminar"
-                   onclick="return confirm('¿Está seguro de eliminar este docente?')">
+                <a href="javascript:void(0)"
+                   class="btn-icon delete"
+                   th:attr="onclick=|abrirEliminar('${d.id}')|">
                   <i class="fas fa-trash"></i>
                 </a>
               </div>
@@ -220,12 +226,58 @@
   </div>
 </div>
 
+
+<div id="modalEliminar" class="modal-overlay">
+  <div class="modal-card" style="text-align:center; max-width:400px;">
+
+    <h2>¿Eliminar docente?</h2>
+    <p>Esta acción no se puede deshacer.</p>
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+
+      <button class="btn-submit" style="flex:1; background:#dc2626;"
+              onclick="confirmarEliminar()">
+        Sí, Eliminar
+      </button>
+
+      <button class="btn-submit" style="flex:1; background:#e5e7eb; color:#333;"
+              onclick="closeModal('modalEliminar')">
+        Cancelar
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+
+
+<div id="modalExito" class="modal-overlay">
+  <div class="modal-card" style="text-align:center; max-width:400px;">
+
+    <h2>Eliminado correctamente</h2>
+    <p>El docente fue eliminado del sistema.</p>
+
+    <button class="btn-submit" style="margin-top:20px; width:100%"
+            onclick="closeModal('modalExito')">
+      OK
+    </button>
+
+  </div>
+</div>
+
 <script>
+  /* =========================
+   MENU
+========================= */
   function toggleMenu() {
     document.getElementById("sidebar").classList.toggle("active");
     document.getElementById("sidebarOverlay").classList.toggle("active");
   }
 
+  /* =========================
+     MODALES BASE
+  ========================= */
   function openModal(id) {
     document.getElementById(id).style.display = "flex";
   }
@@ -234,6 +286,9 @@
     document.getElementById(id).style.display = "none";
   }
 
+  /* =========================
+     VER DOCENTE
+  ========================= */
   function verDocente(nombre, esp, tel) {
     document.getElementById("ver-nombre").innerText = nombre;
     document.getElementById("ver-especialidad").innerText = esp;
@@ -241,6 +296,9 @@
     openModal("modalVer");
   }
 
+  /* =========================
+     EDITAR DOCENTE
+  ========================= */
   function editarDocente(id, nombre, esp, tel) {
     document.getElementById("edit-id").value = id;
     document.getElementById("edit-nombre").value = nombre;
@@ -249,12 +307,76 @@
     openModal("modalEditar");
   }
 
-  // Cerrar modales si se hace clic fuera de la tarjeta
+  /* =========================
+     FILTRO (NOMBRE + ESPECIALIDAD)
+  ========================= */
+  function filtrarDocentes() {
+
+    let nombre = document.getElementById("buscarNombre")?.value.toLowerCase() || "";
+    let esp = document.getElementById("buscarEsp")?.value.toLowerCase() || "";
+
+    let filas = document.querySelectorAll("tbody tr");
+
+    filas.forEach(fila => {
+
+      let nombreTd = fila.querySelector("td[data-label='NOMBRE']");
+      let espTd = fila.querySelector("td[data-label='ESPECIALIDAD'] span");
+
+      if (!nombreTd || !espTd) return;
+
+      let txtNombre = nombreTd.textContent.toLowerCase();
+      let txtEsp = espTd.textContent.toLowerCase();
+
+      let matchNombre = txtNombre.includes(nombre);
+      let matchEsp = txtEsp.includes(esp);
+
+      fila.style.display = (matchNombre && matchEsp) ? "" : "none";
+    });
+  }
+
+  /* =========================
+     ELIMINAR DOCENTE (MODAL)
+  ========================= */
+  let idEliminar = null;
+
+  function abrirEliminar(id) {
+    idEliminar = id;
+    openModal("modalEliminar");
+  }
+
+  function confirmarEliminar() {
+
+    if (!idEliminar) return;
+
+    fetch("/docentes/eliminar/" + idEliminar)
+            .then(res => {
+              if (res.ok) {
+
+                closeModal("modalEliminar");
+                openModal("modalExito");
+
+                setTimeout(() => {
+                  location.reload();
+                }, 1000);
+
+              } else {
+                alert("❌ No se pudo eliminar");
+              }
+            })
+            .catch(err => {
+              console.error(err);
+              alert("❌ Error del servidor");
+            });
+  }
+
+  /* =========================
+     CERRAR AL HACER CLICK FUERA
+  ========================= */
   window.onclick = function(event) {
-    if (event.target.className === 'modal-overlay') {
+    if (event.target.classList.contains("modal-overlay")) {
       event.target.style.display = "none";
     }
-  }
+  };
 </script>
 
 </body>

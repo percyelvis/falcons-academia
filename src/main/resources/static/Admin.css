@@ -74,15 +74,11 @@ body {
 .nav-links a.active { background: var(--primary); color: white; }
 
 /* DROPDOWNS */
-.nav-dropdown { width: 100%; }
 .dropdown-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
+    max-height: none;
+    overflow: visible;
     padding-left: 30px;
 }
-.nav-dropdown:hover .dropdown-content { max-height: 300px; }
-.dropdown-content a { font-size: 14px; padding: 8px 15px; }
 
 .icon-arrow { margin-left: auto; font-size: 10px; transition: 0.3s; }
 .nav-dropdown:hover .icon-arrow { transform: rotate(180deg); }

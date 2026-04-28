@@ -1,157 +1,197 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>Horarios Tutor</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Horario | Falcons</title>
+    <link rel="stylesheet" href="/styleEstudiante/estudianteStyle.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
-        body{
-            font-family: Arial;
-            background:#f5f6fa;
+        /* Estilos específicos para la sección de horarios */
+        .calendar-grid {
+            display: grid;
+            /* Ajustado a 6 columnas para incluir el sábado */
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            margin-top: 20px;
         }
 
-        .rooms-grid{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-            gap:16px;
-            padding:20px;
+        .day-column {
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            min-height: 450px;
+            box-shadow: 0 10px 30px rgba(112, 144, 176, 0.08);
         }
 
-        .room-card{
-            background:#fff;
-            padding:18px;
-            border-radius:12px;
-            cursor:pointer;
-            box-shadow:0 6px 18px rgba(0,0,0,0.1);
+        .day-column h3 {
+            text-align: center;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #a3aed0;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            font-weight: 800;
         }
 
-        .badge{
-            background:#6366f1;
-            color:#fff;
-            padding:4px 8px;
-            border-radius:6px;
-            font-size:12px;
+        .class-card {
+            background: #f4f7fe;
+            border-left: 4px solid #4318ff;
+            padding: 14px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* MODAL */
-        .modal-overlay{
-            position:fixed;
-            inset:0;
-            background:rgba(0,0,0,0.6);
-            display:none;
-            justify-content:center;
-            align-items:center;
+        .class-card:hover {
+            transform: translateY(-5px);
+            background: #ffffff;
+            box-shadow: 0 12px 24px rgba(67, 24, 255, 0.1);
         }
 
-        .modal-box{
-            background:#fff;
-            width:600px;
-            max-width:95%;
-            padding:20px;
-            border-radius:12px;
+        .class-card strong {
+            font-size: 14px;
+            display: block;
+            margin-bottom: 6px;
+            color: #2b3674;
         }
 
-        .horario-card{
-            background:#eef2ff;
-            padding:12px;
-            border-radius:10px;
-            margin-bottom:10px;
+        .class-card p {
+            font-size: 12px;
+            margin: 4px 0;
+            color: #a3aed0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
         }
 
-        .tag{
-            background:#10b981;
-            color:white;
-            padding:3px 6px;
-            font-size:12px;
-            border-radius:5px;
+        .time-badge {
+            display: inline-block;
+            margin-top: 10px;
+            background: #4318ff;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #a3aed0;
+            grid-column: span 6;
+        }
+
+        /* Ajustes Responsive */
+        @media (max-width: 1400px) {
+            .calendar-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 900px) {
+            .calendar-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 600px) {
+            .calendar-grid { grid-template-columns: 1fr; }
+            .empty-state { grid-column: span 1; }
         }
     </style>
 </head>
 
 <body>
 
-<h2 style="padding:20px;">Salones</h2>
+<div class="dashboard-wrapper">
+    <input type="checkbox" id="menu-toggle" class="menu-toggle-input">
 
-<div class="rooms-grid">
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <div class="logo">
+                <i class="fas fa-feather-alt"></i>
+                <span>FALCONS</span>
+            </div>
 
-    <div class="room-card"
-         th:each="s : ${salones}"
-         th:attr="data-id=${s.id}, data-nombre=${s.nombre}"
-         onclick="openModal(this)">
+            <nav class="nav-links">
+                <div class="nav-label">Panel Principal</div>
+                <a href="/dashboard/estudiante" class="active"><i class="fas fa-th-large"></i> <span>Dashboard</span></a>
 
-        <span class="badge">SALÓN</span>
-        <h3 th:text="${s.nombre}"></h3>
-
-        <p>Ver horarios</p>
-    </div>
-
-</div>
-
-<!-- MODAL -->
-<div id="modal" class="modal-overlay" onclick="closeModal(event)">
-    <div class="modal-box">
-
-        <h3 id="titulo">Horarios</h3>
-
-        <div id="contenido">Cargando...</div>
-
-    </div>
-</div>
-
-<script>
-
-    function openModal(el){
-
-        const id = el.dataset.id;
-        const nombre = el.dataset.nombre;
-
-        document.getElementById("titulo").innerText = "Horarios - " + nombre;
-        document.getElementById("modal").style.display = "flex";
-
-        const contenedor = document.getElementById("contenido");
-        contenedor.innerHTML = "Cargando...";
-
-        // ✅ CORRECTO (JSON endpoint)
-        fetch("/tutores/tutor/salon/" + id + "/horarios-json")
-            .then(r => r.json())
-            .then(data => {
-
-                if(!data || data.length === 0){
-                    contenedor.innerHTML = "<p>No hay horarios</p>";
-                    return;
-                }
-
-                let html = "";
-
-                data.forEach(h => {
-
-                    html += `
-                    <div class="horario-card">
-                        <span class="tag">Horario</span>
-                        <p><b>${h.curso?.nombre ?? 'Sin curso'}</b></p>
-                        <p>Docente: ${h.curso?.docente?.nombre ?? 'Sin docente'}</p>
-                        <p>${h.dia} - ${h.horaInicio} a ${h.horaFin}</p>
+                <div class="nav-dropdown">
+                    <div class="dropdown-btn">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Academia</span>
+                        <i class="fas fa-chevron-down icon-arrow"></i>
                     </div>
-                `;
-                });
+                    <div class="dropdown-content">
+                        <a href="/horarios/mis-horarios"><i class="fas fa-clock"></i> Horario</a>
+                        <a href="/cursos/mis-cursos"><i class="fas fa-book-open"></i> Cursos</a>
+                        <a href="/calificaciones/mi-ranking"><i class="fas fa-chart-line"></i> Ranking</a>
+                        <a href="/docentes/mis-docentes"><i class="fas fa-user-tie"></i> Docentes</a>
+                    </div>
+                </div>
 
-                contenedor.innerHTML = html;
-            })
-            .catch(err => {
-                console.log(err);
-                contenedor.innerHTML = "Error cargando horarios";
-            });
-    }
+                <a href="/calificaciones/mis-calificaciones"><i class="fas fa-star"></i> <span>Calificaciones</span></a>
 
-    function closeModal(e){
-        if(!e || e.target.id === "modal"){
-            document.getElementById("modal").style.display = "none";
-        }
-    }
+                <div class="nav-label">Gestión</div>
+                <a href="/pagos/mis-pagos"><i class="fas fa-wallet"></i> Pagos</a>
+                <a href="/configuracion"><i class="fas fa-cog"></i> <span>Configuración</span></a>
+            </nav>
+        </div>
 
-</script>
+        <a href="/login" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i> <span>Cerrar sesión</span>
+        </a>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <label for="menu-toggle" class="hamburger-menu">
+                <i class="fas fa-bars"></i>
+            </label>
+
+            <div class="welcome-text">
+                <h1>Mi Horario Semanal</h1>
+                <p th:text="'Salón: ' + ${estudiante.salon.nombre}">Salón</p>
+            </div>
+
+            <div class="user-pill">
+                <div class="user-info" style="margin-right: 15px;">
+                    <strong th:text="${nombre} + ' ' + ${apellido}">Percy Elvis</strong>
+                    <span>Estudiante</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="calendar-grid">
+
+            <div th:each="diaSemana : ${#strings.arraySplit('Lunes,Martes,Miércoles,Jueves,Viernes,Sábado', ',')}" class="day-column">
+                <h3 th:text="${diaSemana}">Día</h3>
+
+                <div th:each="h : ${horarios}" th:if="${h.dia == diaSemana}" class="class-card">
+                    <strong th:text="${h.curso != null ? h.curso.nombre : 'Sin curso'}">Curso</strong>
+                    <p><i class="fas fa-user-tie"></i>
+                        <span th:text="${h.docente != null ? h.docente.nombre : 'Sin docente'}">Docente</span>
+                    </p>
+                    <span class="time-badge" th:text="${h.horaInicio} + ' - ' + ${h.horaFin}">00:00 - 00:00</span>
+                </div>
+
+                <div th:if="${#lists.isEmpty(horarios.?[dia == '__${diaSemana}__'])}" style="text-align: center; margin-top: 30px; opacity: 0.5;">
+                    <i class="fas fa-mug-hot"></i>
+                    <p style="font-size: 11px; font-weight: 700; margin-top: 5px;">LIBRE</p>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(horarios)}" class="empty-state">
+                <i class="fas fa-calendar-times fa-3x" style="margin-bottom: 15px;"></i>
+                <p>No tienes horarios asignados para este ciclo todavía.</p>
+            </div>
+
+        </div>
+    </main>
+</div>
 
 </body>
 </html>

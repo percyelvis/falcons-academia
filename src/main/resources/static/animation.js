@@ -108,3 +108,62 @@ function descargarPDF(){
 
     html2pdf().from(elemento).save("orden_pago_falcons.pdf");
 }
+
+
+/// ===============================
+// WHATSAPP BOTÓN INFORMACIÓN (PRO)
+// ===============================
+
+function abrirWhatsApp() {
+
+    const telefono = "51918431655";
+
+    const mensaje = `
+🎓 *Academia Falcons*
+
+Hola 👋, me gustaría recibir información detallada sobre su academia:
+
+📚 Programas de estudio disponibles  
+🎯 Modalidades de preparación  
+🧑‍🏫 Docentes y metodología  
+📅 Horarios de clases  
+💰 Costos y proceso de matrícula  
+
+Espero su respuesta. ¡Gracias! 😊
+`;
+
+    const url = "https://wa.me/" + telefono + "?text=" + encodeURIComponent(mensaje);
+
+    window.open(url, "_blank");
+}
+
+
+// ===============================
+// BOTÓN WHATSAPP FLOTANTE (PRO)
+// ===============================
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    const telefono = "51918431655";
+
+    const mensaje = `
+🎓 *Academia Falcons*
+
+Hola 👋, quisiera información sobre:
+
+📚 Cursos y programas  
+📅 Horarios disponibles  
+🧑‍🏫 Nivel académico y docentes  
+💰 Costos y matrícula  
+
+Gracias por la atención 😊
+`;
+
+    const url = "https://wa.me/" + telefono + "?text=" + encodeURIComponent(mensaje);
+
+    const btn = document.getElementById("btnWhatsApp");
+
+    if (btn) {
+        btn.href = url;
+    }
+});

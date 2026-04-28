@@ -16,7 +16,6 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-top">
       <div class="logo">
-        <i class="fas fa-shield-alt"></i>
         <span>FALCONS ADMIN</span>
       </div>
 
@@ -35,7 +34,7 @@
           <div class="dropdown-content">
             <a href="/estudiantes"><i class="fas fa-user-graduate"></i> Estudiantes</a>
             <a href="/docentes"><i class="fas fa-chalkboard-teacher"></i> Docentes</a>
-            <a href="/tutores"><i class="fas fa-user-shield"></i> Tutores</a>
+            <a href="/tutores" class="active"><i class="fas fa-user-shield"></i> Tutores</a>
             <a href="/egresados"><i class="fas fa-user-check"></i> Egresados</a>
           </div>
         </div>
@@ -140,11 +139,11 @@
                         th:data-telefono-tutor="${t.telefono}">
                   <i class="fas fa-pen"></i>
                 </button>
-                <a th:href="@{'/tutores/eliminar/' + ${t.id}}"
-                   class="btn-icon delete" title="Eliminar"
-                   onclick="return confirm('¿Está seguro de eliminar este tutor?')">
+                <button class="btn-icon delete"
+                        title="Eliminar"
+                        th:attr="onclick=|abrirEliminar(${t.id})|">
                   <i class="fas fa-trash"></i>
-                </a>
+                </button>
               </div>
             </td>
           </tr>
@@ -256,6 +255,35 @@
   </div>
 </div>
 
+
+<div id="modalEliminar" class="modal-overlay">
+  <div class="modal-card" style="max-width: 400px; text-align: center;">
+
+    <div class="modal-header">
+      <h2>Confirmar Eliminación</h2>
+      <button class="close-modal" onclick="closeModal('modalEliminar')">&times;</button>
+    </div>
+
+    <p style="margin: 20px 0;">
+      ¿Está seguro de eliminar este tutor? Esta acción no se puede deshacer.
+    </p>
+
+    <div style="display:flex; gap:10px;">
+      <button class="btn-submit" style="background:#dc2626; flex:1;"
+              onclick="confirmarEliminar()">
+        Eliminar
+      </button>
+
+      <button class="btn-submit" style="background:#e5e7eb; color:#000; flex:1;"
+              onclick="closeModal('modalEliminar')">
+        Cancelar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
 <script>
   function toggleMenu() {
     document.getElementById("sidebar").classList.toggle("active");
@@ -304,6 +332,61 @@
       event.target.style.display = "none";
     }
   }
+
+
+    let idEliminar = null;
+
+    /* MENU */
+    function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("active");
+    document.getElementById("sidebarOverlay").classList.toggle("active");
+  }
+
+    /* MODALES */
+    function openModal(id) {
+    document.getElementById(id).style.display = "flex";
+  }
+
+    function closeModal(id) {
+    document.getElementById(id).style.display = "none";
+  }
+
+    /* =========================
+    ELIMINAR TUTOR (MODAL)
+    ========================= */
+
+    function abrirEliminar(id) {
+    idEliminar = id;
+    openModal("modalEliminar");
+  }
+
+    function confirmarEliminar() {
+
+    if (!idEliminar) return;
+
+    fetch("/tutores/eliminar/" + idEliminar, {
+    method: "GET"
+  })
+    .then(res => {
+    if (res.ok) {
+    closeModal("modalEliminar");
+    location.reload();
+  } else {
+    alert("Error al eliminar");
+  }
+  })
+    .catch(() => {
+    alert("Error del servidor");
+  });
+
+  }
+
+    /* cerrar clic fuera */
+    window.onclick = function(event) {
+    if (event.target.classList.contains("modal-overlay")) {
+    event.target.style.display = "none";
+  }
+  };
 </script>
 
 </body>

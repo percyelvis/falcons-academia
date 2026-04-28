@@ -1,8 +1,10 @@
 package com.falcons.proyecto_falcons.controller;
 
 import com.falcons.proyecto_falcons.entity.Estudiante;
+import com.falcons.proyecto_falcons.entity.PreMatricula;
 import com.falcons.proyecto_falcons.entity.Usuario;
 import com.falcons.proyecto_falcons.service.EstudianteService;
+import com.falcons.proyecto_falcons.service.PreMatriculaService;
 import com.falcons.proyecto_falcons.service.UsuarioService;
 import com.falcons.proyecto_falcons.service.SalonService;
 
@@ -29,6 +31,8 @@ public class EstudianteController {
 
     @Autowired
     private SalonService salonService;
+    @Autowired
+    private PreMatriculaService preMatriculaService;
 
     // =========================
     // 📋 LISTAR (ADMIN)
@@ -157,6 +161,34 @@ public class EstudianteController {
         data.put("usuario", u);
 
         return data;
+    }
+
+    @PostMapping("/desde-prematricula/{id}")
+    @ResponseBody
+    public String matricularDesdePrematricula(@PathVariable Long id) {
+
+        // 1. buscar prematricula
+        PreMatricula p = preMatriculaService.obtenerPorId(id);
+
+        // 2. convertir a estudiante
+        Estudiante e = new Estudiante();
+
+        Usuario u = new Usuario();
+        u.setNombres(p.getNombres());
+        u.setApellidos(p.getApellidos());
+        u.setDni(p.getDni());
+        u.setEmail(p.getCorreo());
+        u.setTelefono(p.getTelefono());
+        u.setRol("ESTUDIANTE");
+
+        e.setUsuario(u);
+
+        estudianteService.crearEstudiante(e);
+
+        // 3. eliminar prematricula (opcional pero recomendado)
+        preMatriculaService.eliminar(id);
+
+        return "OK";
     }
 
 }

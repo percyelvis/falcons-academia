@@ -62,8 +62,7 @@ public class ConfiguracionController {
     @PostMapping("/cambiar-password")
     public String cambiarPassword(@RequestParam String actual,
                                   @RequestParam String nueva,
-                                  HttpSession session,
-                                  Model model) {
+                                  HttpSession session) {
 
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
 
@@ -73,17 +72,17 @@ public class ConfiguracionController {
 
         if (db == null) return "redirect:/login";
 
-        // ⚠️ VALIDAR CONTRASEÑA ACTUAL
+        // ❌ error
         if (!db.getPassword().equals(actual)) {
-            model.addAttribute("error", "Contraseña actual incorrecta");
-            return "estudiante/miConfiguracion";
+            return "redirect:/configuracion?error=password";
         }
 
-        db.setPassword(nueva); // (luego lo puedes encriptar con BCrypt)
+        // ✅ éxito
+        db.setPassword(nueva);
         usuarioRepository.save(db);
 
         session.setAttribute("usuarioLogueado", db);
 
-        return "redirect:/configuracion";
+        return "redirect:/configuracion?success=password";
     }
 }
