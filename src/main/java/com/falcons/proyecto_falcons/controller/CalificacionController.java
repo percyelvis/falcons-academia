@@ -145,7 +145,7 @@ public class CalificacionController {
         if (ultimoExamen == null) {
             model.addAttribute("ranking", List.of());
             model.addAttribute("examen", null);
-            return "publico/ranking"; // 👈 IMPORTANTE
+            return "ranking"; // 👈 IMPORTANTE
         }
 
         model.addAttribute("examen", ultimoExamen);

@@ -243,7 +243,7 @@ public class AuthController {
 
     @GetMapping("/nosotros")
     public String nosotros() {
-        return "/nosotros";
+        return "nosotros";
     }
 
     // =========================
