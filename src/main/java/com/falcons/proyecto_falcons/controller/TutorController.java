@@ -65,7 +65,7 @@ public class TutorController {
 
         tutorService.crearTutor(tutor);
 
-        return "redirect:/tutores";
+        return "adminstrador/tutores";
     }
 
     // ================= EDITAR =================
