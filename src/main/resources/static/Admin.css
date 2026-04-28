@@ -1001,3 +1001,89 @@ input, select {
 @media (max-width: 1100px) {
     .layout-calificaciones { grid-template-columns: 1fr; }
 }
+
+/* ================= MOBILE: SUBMENÚS COMPACTOS ================= */
+@media (max-width: 992px) {
+
+    /* Hace el sidebar más compacto tipo app */
+    .sidebar {
+        padding: 20px 15px;
+    }
+
+    /* Submenús más compactos */
+    .dropdown-content {
+        padding-left: 15px;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    /* Mostrar SOLO cuando se activa hover/click */
+    .nav-dropdown:hover .dropdown-content {
+        max-height: 500px;
+    }
+
+    /* Links más pequeños */
+    .nav-links a,
+    .dropdown-btn {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    /* Íconos más compactos */
+    .nav-links i {
+        font-size: 14px;
+    }
+
+    /* Evita que el menú empuje todo */
+    .nav-label {
+        margin: 12px 0 8px 10px;
+        font-size: 10px;
+    }
+
+    /* LOGO más pequeño en móvil */
+    .logo {
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    /* Botón cerrar más visible (IMPORTANTE) */
+    .mobile-close {
+        width: 40px;
+        height: 40px;
+        font-size: 22px;
+        z-index: 9999;
+    }
+}
+
+@media (max-width: 992px) {
+
+    /* Empuja el botón de logout hacia arriba */
+    .btn-logout {
+        margin-top: 10px;   /* antes era auto */
+        padding: 12px 15px;
+        border-radius: 12px;
+        background: #fff5f5;
+    }
+
+    /* Ajusta el sidebar para que no deje tanto espacio vacío */
+    .sidebar {
+        justify-content: flex-start;
+    }
+
+    /* Opcional: hace que el menú use mejor el espacio */
+    .sidebar-top {
+        flex: 1;
+        overflow-y: auto;
+    }
+}
+@media (max-width: 992px) {
+    .btn-logout {
+        position: sticky;
+        bottom: 15px;
+        background: #fee2e2;
+        color: #dc2626;
+        font-weight: 800;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    }
+}

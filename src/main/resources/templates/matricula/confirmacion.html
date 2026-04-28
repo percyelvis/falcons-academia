@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <link rel="icon" type="image/png" href="/logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finalizar Pago | Falcons ELP</title>
@@ -214,7 +215,7 @@
     }
 
     function generateCode() {
-        const code = "ELP-" + Math.floor(Math.random()*899999 + 100000);
+        const code = "FAL-" + Math.floor(Math.random()*899999 + 100000);
         const res = document.getElementById('codeResult');
         res.innerText = code;
         res.classList.add('active');
